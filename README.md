@@ -2,6 +2,10 @@
 
 Live app, code and explanation in this [post](https://porkostomus.gitlab.io/posts-output/2018-10-23-minesweeper/).
 
+Screenshot:
+
+![screenshot](2018-10-24-140241_1366x768_scrot.png)
+
 To get an interactive development environment run:
 
     lein fig:build
