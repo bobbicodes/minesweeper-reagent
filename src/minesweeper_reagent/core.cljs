@@ -1,10 +1,9 @@
 (ns ^:figwheel-hooks minesweeper-reagent.core
-  (:require
-   [goog.dom :as gdom]
-   [reagent.core :as reagent :refer [atom]]))
+  (:require [goog.dom :as gdom]
+                      [reagent.core :as reagent :refer [atom]]))
 
-(def board-width 9)
-(def board-height 9)
+(def board-width 12)
+(def board-height 12)
 (def num-mines 18)
 
 (defn rand-positions []
@@ -25,15 +24,21 @@
              (rand-positions)
              (set-mines))))
 
-(defonce app-state (atom{:matrix (init-matrix)
+(defonce app-state (atom {:matrix (init-matrix)
      :stepped []
      :game-status :in-progress
      :message "Tread lightly..."}))
+
+(defn step! [x y]
+  (swap! app-state assoc-in [:stepped]
+                  (conj (:stepped @app-state) [x y])))
 
 ; mine-detector
 
 (defn mine? [x y]
   (= 1 (get (:matrix @app-state) [x y])))
+
+; directional middleware
 
 (defn top-left? [x y n]
   (if (mine? (dec x) (dec y))
@@ -87,11 +92,25 @@
        (apply left?)
        last))
 
+; remove invalid and duplicate squares
+
+(defn valid-square? [[x y]]
+  (and (<= 0 x (dec board-width))
+             (<= 0 y (dec board-width))))
+
+(defn filter-squares [[x y]]
+      (filter valid-square? (distinct (:stepped @app-state))))
+
+(defn win? []
+  (= num-mines
+    (-  (* board-height board-width)
+         (count (filter-squares (:stepped @app-state))))))
+
 ; clear squares
 
-(defn step [x y]
+(defn clear-squares [x y] 
   (swap! app-state assoc-in [:stepped]
-         (conj (:stepped @app-state)
+    (conj (:stepped @app-state) 
                [(dec x) (dec y)]
                [x (dec y)]
                [x (inc y)]
@@ -101,24 +120,33 @@
                [(inc x) (inc y)]
                [(dec x) (inc y)])))
 
+(defn check-squares []
+  (map clear-squares (distinct (:stepped @app-state))))
+
+; render UI
+
 (defn get-app-element []
   (gdom/getElement "app"))
 
-(defn blank [i j]
+(defn blank [x y]
   [:rect
    {:width 0.9
     :height 0.9
     :fill "grey"
-    :x (+ 0.05 i)
-    :y (+ 0.05 j)
+    :x (+ 0.05 x)
+    :y (+ 0.05 y)
     :on-click
     (fn blank-click [e]
       (when (= (:game-status @app-state) :in-progress)
-        (swap! app-state assoc-in [:stepped]
-               (conj (:stepped @app-state) [i j]))
-        (if (= 1 (get (:matrix @app-state) [i j]))
+        (step! x y)
+        (if (win?)
+             (do (swap! app-state assoc :game-status :win)
+                     (swap! app-state assoc :message "Congratulations!")))
+        (if (= 1 (get (:matrix @app-state) [x y]))
           (do (swap! app-state assoc :game-status :dead)
-            (swap! app-state assoc :message "Fuck. You blew up.")))))}])
+            (swap! app-state assoc :message "Fuck. You blew up."))
+          (if (zero? (mine-detector x y))
+            (clear-squares x y)))))}])
 
 (defn rect-cell
   [x y]
@@ -148,9 +176,6 @@
             "scale(0.3)")}
    [:line {:x1 -1 :y1 -1 :x2 1 :y2 1}]
    [:line {:x1 1 :y1 -1 :x2 -1 :y2 1}]])
-
-(defn clear-squares! []
-  (map step (:stepped @app-state)))
 
 (defn render-board []
   (into
