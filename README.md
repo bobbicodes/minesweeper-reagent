@@ -1,6 +1,7 @@
 # minesweeper-reagent
 
-Live app, code and explanation in this [post](https://porkostomus.gitlab.io/posts-output/2018-10-23-minesweeper/).
+Live app [here](https://porkostomus.github.io/minesweeper-reagent/).
+Interactive code and explanation in this [post](https://porkostomus.gitlab.io/posts-output/2018-10-23-minesweeper/).
 
 Screenshot:
 
