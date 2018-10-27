@@ -108,9 +108,8 @@
 
 ; clear squares
 
-(defn clear-squares [x y] 
-  (swap! app-state assoc-in [:stepped]
-    (conj (:stepped @app-state) 
+(defn clear-squares [[x y]]
+    (conj (filter-squares (:stepped @app-state))
                [(dec x) (dec y)]
                [x (dec y)]
                [x (inc y)]
@@ -118,10 +117,18 @@
                [(inc x) y] 
                [(inc x) (dec y)]
                [(inc x) (inc y)]
-               [(dec x) (inc y)])))
+               [(dec x) (inc y)]))
 
-(defn check-squares []
-  (map clear-squares (distinct (:stepped @app-state))))
+(defn clear? [[x y]]
+  (zero? (mine-detector x y)))
+
+(defn update-board! []
+  (loop [x (count (filter-squares (:stepped @app-state)))]
+    (swap! app-state assoc-in [:stepped]
+      (first (map clear-squares (filter clear? (:stepped @app-state)))))
+    (if (not= x (count (filter-squares (:stepped @app-state))))
+             (recur (count (filter-squares (:stepped @app-state)))))))
+
 
 ; render UI
 
@@ -145,8 +152,7 @@
         (if (= 1 (get (:matrix @app-state) [x y]))
           (do (swap! app-state assoc :game-status :dead)
             (swap! app-state assoc :message "Fuck. You blew up."))
-          (if (zero? (mine-detector x y))
-            (clear-squares x y)))))}])
+          (update-board!))))}])
 
 (defn rect-cell
   [x y]
