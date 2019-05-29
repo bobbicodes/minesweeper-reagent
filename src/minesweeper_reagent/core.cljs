@@ -31,7 +31,7 @@
      :message "Tread lightly..."}))
 
 (defn step! [x y]
-  (swap! app-state assoc-in [:stepped]
+  (swap! app-state assoc :stepped
                   (conj (:stepped @app-state) [x y])))
 
 ; mine-detector
@@ -125,7 +125,7 @@
 
 (defn update-board! []
   (loop [x (count (filter-squares (:stepped @app-state)))]
-    (swap! app-state assoc-in [:stepped]
+    (swap! app-state assoc :stepped
       (first (map clear-squares (filter clear? (:stepped @app-state)))))
     (if (not= x (count (filter-squares (:stepped @app-state))))
              (recur (count (filter-squares (:stepped @app-state)))))))
