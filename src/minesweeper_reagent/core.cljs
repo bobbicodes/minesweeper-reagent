@@ -24,7 +24,8 @@
              (rand-positions)
              (set-mines))))
 
-(defonce app-state (atom {:matrix (init-matrix)
+(defonce app-state (atom {
+     :matrix (init-matrix)
      :stepped []
      :game-status :in-progress
      :message "Tread lightly..."}))
@@ -96,7 +97,7 @@
 
 (defn valid-square? [[x y]]
   (and (<= 0 x (dec board-width))
-             (<= 0 y (dec board-width))))
+             (<= 0 y (dec board-height))))
 
 (defn filter-squares [[x y]]
       (filter valid-square? (distinct (:stepped @app-state))))
