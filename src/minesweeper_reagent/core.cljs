@@ -30,10 +30,6 @@
      :game-status :in-progress
      :message "Tread lightly..."}))
 
-(defn step! [x y]
-  (swap! app-state assoc :stepped
-                  (conj (:stepped @app-state) [x y])))
-
 ; mine-detector
 
 (defn mine? [x y]
@@ -102,8 +98,12 @@
 (defn filter-any-squares [squares]
       (filter valid-square? (distinct squares)))
 
+(defn step! [x y]
+  (swap! app-state assoc :stepped
+                  (filter-any-squares (conj (:stepped @app-state) [x y]))))
+
 (defn filter-squares []
-      (filter-any-squares (:stepped @app-state)))
+      (:stepped @app-state))
 
 (defn win? []
   (= num-mines
@@ -129,7 +129,7 @@
 (defn update-board! []
   (loop [x (count (filter-squares))]
     (swap! app-state assoc :stepped
-      (first (map clear-squares (filter clear? (:stepped @app-state)))))
+      (filter-any-squares (first (map clear-squares (filter clear? (:stepped @app-state))))))
     (if (not= x (count (filter-squares)))
              (recur (count (filter-squares))))))
 
