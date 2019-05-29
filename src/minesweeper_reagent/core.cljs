@@ -24,7 +24,7 @@
              (rand-positions)
              (set-mines))))
 
-(defonce app-state (atom {
+(def app-state (atom {
      :matrix (init-matrix)
      :stepped []
      :game-status :in-progress
@@ -99,18 +99,18 @@
   (and (<= 0 x (dec board-width))
              (<= 0 y (dec board-height))))
 
-(defn filter-squares [[x y]]
+(defn filter-squares []
       (filter valid-square? (distinct (:stepped @app-state))))
 
 (defn win? []
   (= num-mines
     (-  (* board-height board-width)
-         (count (filter-squares (:stepped @app-state))))))
+         (count (filter-squares ())))))
 
 ; clear squares
 
 (defn clear-squares [[x y]]
-    (conj (filter-squares (:stepped @app-state))
+    (conj (filter-squares ())
                [(dec x) (dec y)]
                [x (dec y)]
                [x (inc y)]
@@ -124,11 +124,11 @@
   (zero? (mine-detector x y)))
 
 (defn update-board! []
-  (loop [x (count (filter-squares (:stepped @app-state)))]
+  (loop [x (count (filter-squares ()))]
     (swap! app-state assoc :stepped
       (first (map clear-squares (filter clear? (:stepped @app-state)))))
-    (if (not= x (count (filter-squares (:stepped @app-state))))
-             (recur (count (filter-squares (:stepped @app-state)))))))
+    (if (not= x (count (filter-squares ())))
+             (recur (count (filter-squares ()))))))
 
 
 ; render UI
