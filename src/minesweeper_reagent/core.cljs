@@ -26,7 +26,7 @@
 
 (def app-state (atom {
      :matrix (init-matrix)
-     :stepped []
+     :stepped #{}
      :game-status :in-progress
      :message "Tread lightly..."}))
 
@@ -96,7 +96,7 @@
              (<= 0 y (dec board-height))))
 
 (defn filter-any-squares [squares]
-      (filter valid-square? (distinct squares)))
+      (filter valid-square? squares))
 
 (defn step! [x y]
   (swap! app-state assoc :stepped
@@ -156,7 +156,8 @@
         (if (= 1 (get (:matrix @app-state) [x y]))
           (do (swap! app-state assoc :game-status :dead)
             (swap! app-state assoc :message "Fuck. You blew up."))
-          (update-board!))))}])
+          ; (update-board!) 
+        )))}])
 
 (defn rect-cell
   [x y]
@@ -213,7 +214,7 @@
               :matrix (init-matrix)
               :message "Welcome back"
               :game-status :in-progress
-              :stepped []))}
+              :stepped #{}) )}
     "Reset"]
    [:div [render-board]]])
 
