@@ -108,31 +108,35 @@
 (defn win? []
   (= num-mines
     (-  (* board-height board-width)
-         (count (filter-squares)))))
+         (count (:stepped @app-state)))))
 
-; clear squares
-
-(defn clear-squares [[x y]]
-    (conj (filter-squares)
-               [(dec x) (dec y)]
-               [x (dec y)]
-               [x (inc y)]
-               [(dec x) y]
-               [(inc x) y] 
-               [(inc x) (dec y)]
-               [(inc x) (inc y)]
-               [(dec x) (inc y)]))
+(defn adjacents [[x y]]
+    (filter-any-squares
+               #{ [(dec x) (dec y)]
+                  [x (dec y)]
+                  [x (inc y)]
+                  [(dec x) y]
+                  [(inc x) y] 
+                  [(inc x) (dec y)]
+                  [(inc x) (inc y)]
+                  [(dec x) (inc y)] }))
 
 (defn clear? [[x y]]
   (zero? (mine-detector x y)))
 
-(defn update-board! []
-  (loop [x (count (filter-squares))]
-    (swap! app-state assoc :stepped
-      (filter-any-squares (first (map clear-squares (filter clear? (:stepped @app-state))))))
-    (if (not= x (count (filter-squares)))
-             (recur (count (filter-squares))))))
+(defn flood [exposed [x y]]
+  (let [ne (conj exposed [x y])]
+    (if (= 1 (get (:matrix @app-state) [x y]))
+        ne
+        (cset/union ne (adjacents [x y]))
+    )
+  )
+)
 
+(defn update-board! [cell]
+    (swap! app-state assoc :stepped
+                  (flood (:stepped @app-state) cell))
+)
 
 ; render UI
 
@@ -149,14 +153,13 @@
     :on-click
     (fn blank-click [e]
       (when (= (:game-status @app-state) :in-progress)
-        (step! x y)
+        (update-board! [x y])
         (if (win?)
              (do (swap! app-state assoc :game-status :win)
                      (swap! app-state assoc :message "Congratulations!")))
         (if (= 1 (get (:matrix @app-state) [x y]))
           (do (swap! app-state assoc :game-status :dead)
             (swap! app-state assoc :message "Fuck. You blew up."))
-          ; (update-board!) 
         )))}])
 
 (defn rect-cell
