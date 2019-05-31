@@ -35,60 +35,6 @@
 (defn mine? [x y]
   (= 1 (get (:matrix @app-state) [x y])))
 
-; directional middleware
-
-(defn top-left? [x y n]
-  (if (mine? (dec x) (dec y))
-    [x y (inc n)]
-    [x y n]))
-
-(defn top? [x y n]
-  (if (mine? x (dec y))
-    [x y (inc n)]
-    [x y n]))
-
-(defn top-right? [x y n]
-  (if (mine? (inc x) (dec y))
-    [x y (inc n)]
-    [x y n]))
-
-(defn right? [x y n]
-  (if (mine? (inc x) y)
-    [x y (inc n)]
-    [x y n]))
-
-(defn bottom-right? [x y n]
-  (if (mine? (inc x) (inc y))
-    [x y (inc n)]
-    [x y n]))
-
-(defn bottom? [x y n]
-  (if (mine? x (inc y))
-    [x y (inc n)]
-    [x y n]))
-
-(defn bottom-left? [x y n]
-  (if (mine? (dec x) (inc y))
-    [x y (inc n)]
-    [x y n]))
-
-(defn left? [x y n]
-  (if (mine? (dec x) y)
-    [x y (inc n)]
-    [x y n]))
-
-(defn mine-detector [x y]
-  (->> [x y 0]
-       (apply top-left?)
-       (apply top?)
-       (apply top-right?)
-       (apply right?)
-       (apply bottom-right?)
-       (apply bottom?)
-       (apply bottom-left?)
-       (apply left?)
-       last))
-
 ; remove invalid and duplicate squares
 
 (defn valid-square? [[x y]]
@@ -111,6 +57,9 @@
                   [(inc x) (inc y)]
                   [(dec x) (inc y)] }))
 
+(defn mine-detector [x y]
+  (reduce + 0 (map (partial get (:matrix @app-state)) (adjacents [x y]))))
+
 (defn clear? [[x y]]
   (zero? (mine-detector x y)))
 
@@ -127,8 +76,7 @@
 )
 
 (defn update-board! [cell]
-    (swap! app-state assoc :stepped
-                  (flood (:stepped @app-state) cell))
+    (swap! app-state assoc :stepped (flood (:stepped @app-state) cell))
 )
 
 ; render UI
