@@ -95,23 +95,13 @@
   (and (<= 0 x (dec board-width))
              (<= 0 y (dec board-height))))
 
-(defn filter-any-squares [squares]
-      (filter valid-square? squares))
-
-(defn step! [x y]
-  (swap! app-state assoc :stepped
-                  (filter-any-squares (conj (:stepped @app-state) [x y]))))
-
-(defn filter-squares []
-      (:stepped @app-state))
-
 (defn win? []
   (= num-mines
     (-  (* board-height board-width)
          (count (:stepped @app-state)))))
 
 (defn adjacents [[x y]]
-    (filter-any-squares
+    (filter valid-square? 
                #{ [(dec x) (dec y)]
                   [x (dec y)]
                   [x (inc y)]
@@ -125,10 +115,13 @@
   (zero? (mine-detector x y)))
 
 (defn flood [exposed [x y]]
-  (let [ne (conj exposed [x y])]
-    (if (= 1 (get (:matrix @app-state) [x y]))
-        ne
-        (cset/union ne (adjacents [x y]))
+  (if (some #{[x y]} exposed)
+    exposed
+    (let [new-exposed (conj exposed [x y])]
+      (if (or (mine? x y) (not (clear? [x y])))
+          new-exposed
+          (reduce flood new-exposed (adjacents [x y]))
+      )
     )
   )
 )
