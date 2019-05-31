@@ -32,8 +32,11 @@
 
 ; mine-detector
 
+(defn mine-count [[x y]]
+  (get (:matrix @app-state) [x y]))
+
 (defn mine? [x y]
-  (= 1 (get (:matrix @app-state) [x y])))
+  (= 1 (mine-count [x y])))
 
 ; remove invalid and duplicate squares
 
@@ -58,7 +61,7 @@
                   [(dec x) (inc y)] }))
 
 (defn mine-detector [x y]
-  (reduce + 0 (map (partial get (:matrix @app-state)) (adjacents [x y]))))
+  (reduce + 0 (map mine-count (adjacents [x y]))))
 
 (defn clear? [[x y]]
   (zero? (mine-detector x y)))
