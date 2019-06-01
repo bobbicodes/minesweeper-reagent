@@ -24,111 +24,63 @@
              (rand-positions)
              (set-mines))))
 
-(defonce app-state (atom {:matrix (init-matrix)
-     :stepped []
+(def app-state (atom {
+     :matrix (init-matrix)
+     :stepped #{}
      :game-status :in-progress
      :message "Tread lightly..."}))
 
-(defn step! [x y]
-  (swap! app-state assoc-in [:stepped]
-                  (conj (:stepped @app-state) [x y])))
-
 ; mine-detector
 
+(defn mine-count [[x y]]
+  (get (:matrix @app-state) [x y]))
+
 (defn mine? [x y]
-  (= 1 (get (:matrix @app-state) [x y])))
-
-; directional middleware
-
-(defn top-left? [x y n]
-  (if (mine? (dec x) (dec y))
-    [x y (inc n)]
-    [x y n]))
-
-(defn top? [x y n]
-  (if (mine? x (dec y))
-    [x y (inc n)]
-    [x y n]))
-
-(defn top-right? [x y n]
-  (if (mine? (inc x) (dec y))
-    [x y (inc n)]
-    [x y n]))
-
-(defn right? [x y n]
-  (if (mine? (inc x) y)
-    [x y (inc n)]
-    [x y n]))
-
-(defn bottom-right? [x y n]
-  (if (mine? (inc x) (inc y))
-    [x y (inc n)]
-    [x y n]))
-
-(defn bottom? [x y n]
-  (if (mine? x (inc y))
-    [x y (inc n)]
-    [x y n]))
-
-(defn bottom-left? [x y n]
-  (if (mine? (dec x) (inc y))
-    [x y (inc n)]
-    [x y n]))
-
-(defn left? [x y n]
-  (if (mine? (dec x) y)
-    [x y (inc n)]
-    [x y n]))
-
-(defn mine-detector [x y]
-  (->> [x y 0]
-       (apply top-left?)
-       (apply top?)
-       (apply top-right?)
-       (apply right?)
-       (apply bottom-right?)
-       (apply bottom?)
-       (apply bottom-left?)
-       (apply left?)
-       last))
+  (= 1 (mine-count [x y])))
 
 ; remove invalid and duplicate squares
 
 (defn valid-square? [[x y]]
   (and (<= 0 x (dec board-width))
-             (<= 0 y (dec board-width))))
-
-(defn filter-squares [[x y]]
-      (filter valid-square? (distinct (:stepped @app-state))))
+             (<= 0 y (dec board-height))))
 
 (defn win? []
   (= num-mines
     (-  (* board-height board-width)
-         (count (filter-squares (:stepped @app-state))))))
+         (count (:stepped @app-state)))))
 
-; clear squares
+(defn adjacents [[x y]]
+    (filter valid-square? 
+               #{ [(dec x) (dec y)]
+                  [x (dec y)]
+                  [x (inc y)]
+                  [(dec x) y]
+                  [(inc x) y] 
+                  [(inc x) (dec y)]
+                  [(inc x) (inc y)]
+                  [(dec x) (inc y)] }))
 
-(defn clear-squares [[x y]]
-    (conj (filter-squares (:stepped @app-state))
-               [(dec x) (dec y)]
-               [x (dec y)]
-               [x (inc y)]
-               [(dec x) y]
-               [(inc x) y] 
-               [(inc x) (dec y)]
-               [(inc x) (inc y)]
-               [(dec x) (inc y)]))
+(defn mine-detector [x y]
+  (reduce + 0 (map mine-count (adjacents [x y]))))
 
 (defn clear? [[x y]]
   (zero? (mine-detector x y)))
 
-(defn update-board! []
-  (loop [x (count (filter-squares (:stepped @app-state)))]
-    (swap! app-state assoc-in [:stepped]
-      (first (map clear-squares (filter clear? (:stepped @app-state)))))
-    (if (not= x (count (filter-squares (:stepped @app-state))))
-             (recur (count (filter-squares (:stepped @app-state)))))))
+(defn flood [exposed [x y]]
+  (if (some #{[x y]} exposed)
+    exposed
+    (let [new-exposed (conj exposed [x y])]
+      (if (or (mine? x y) (not (clear? [x y])))
+          new-exposed
+          (reduce flood new-exposed (adjacents [x y]))
+      )
+    )
+  )
+)
 
+(defn update-board! [cell]
+    (swap! app-state assoc :stepped (flood (:stepped @app-state) cell))
+)
 
 ; render UI
 
@@ -145,14 +97,14 @@
     :on-click
     (fn blank-click [e]
       (when (= (:game-status @app-state) :in-progress)
-        (step! x y)
+        (update-board! [x y])
         (if (win?)
              (do (swap! app-state assoc :game-status :win)
                      (swap! app-state assoc :message "Congratulations!")))
         (if (= 1 (get (:matrix @app-state) [x y]))
           (do (swap! app-state assoc :game-status :dead)
             (swap! app-state assoc :message "Fuck. You blew up."))
-          (update-board!))))}])
+        )))}])
 
 (defn rect-cell
   [x y]
@@ -209,7 +161,7 @@
               :matrix (init-matrix)
               :message "Welcome back"
               :game-status :in-progress
-              :stepped []))}
+              :stepped #{}) )}
     "Reset"]
    [:div [render-board]]])
 
