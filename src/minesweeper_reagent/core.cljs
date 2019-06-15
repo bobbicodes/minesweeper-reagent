@@ -12,11 +12,18 @@
           j (range board-height)]
       [i j])))
 
+(defn init-square [mine] 
+  {
+   :mined mine
+   :exposed false
+  }
+)
+
 (defn set-mines [] 
-  (loop [squares (repeat num-mines 1)]
+  (loop [squares (repeat num-mines (init-square true))]
     (if (= (count squares) (* board-width board-height))
       squares
-      (recur (conj squares 0)))))
+      (recur (conj squares (init-square false))))))
 
 (defn init-matrix []
   (into {}
@@ -24,30 +31,19 @@
              (rand-positions)
              (set-mines))))
 
-(def app-state (atom {
-     :matrix (init-matrix)
-     :stepped #{}
-     :game-status :in-progress
-     :message "Tread lightly..."}))
+(def app-state (atom (init-matrix)))
 
 ; mine-detector
 
-(defn mine-count [[x y]]
-  (get (:matrix @app-state) [x y]))
-
-(defn mine? [x y]
-  (= 1 (mine-count [x y])))
+(defn mine? [app-state x y]
+  (:mined (get app-state [x y]))
+)
 
 ; remove invalid and duplicate squares
 
 (defn valid-square? [[x y]]
   (and (<= 0 x (dec board-width))
              (<= 0 y (dec board-height))))
-
-(defn win? []
-  (= num-mines
-    (-  (* board-height board-width)
-         (count (:stepped @app-state)))))
 
 (defn adjacents [[x y]]
     (filter valid-square? 
@@ -60,29 +56,48 @@
                   [(inc x) (inc y)]
                   [(dec x) (inc y)] }))
 
-(defn mine-detector [x y]
-  (reduce + 0 (map mine-count (adjacents [x y]))))
+(defn mine-count [app-state [x y]]
+  (if (mine? app-state x y) 1 0)
+)
 
-(defn clear? [[x y]]
-  (zero? (mine-detector x y)))
+(defn mine-detector [app-state x y]
+  (reduce + 0 (map (partial mine-count app-state) (adjacents [x y]))))
 
-(defn flood [exposed [x y]]
-  (if (some #{[x y]} exposed)
-    exposed
-    (let [new-exposed (conj exposed [x y])]
-      (if (or (mine? x y) (not (clear? [x y])))
-          new-exposed
-          (reduce flood new-exposed (adjacents [x y]))
+(defn clear? [app-state x y]
+  (zero? (mine-detector app-state x y)))
+
+(defn flood [app-state [x y]]
+  (let [cell (get app-state [x y])]
+    (if (:exposed cell)
+      app-state
+      (let [new-app-state (assoc app-state [x y] (assoc cell :exposed true))]
+        (if (or (:mined cell) (not (clear? app-state x y)))
+            new-app-state
+            (reduce flood new-app-state (adjacents [x y]))
+        )
       )
     )
   )
 )
 
-(defn update-board! [cell]
-    (swap! app-state assoc :stepped (flood (:stepped @app-state) cell))
+; render UI
+
+(defn game-status [app-state]
+  (if (some (fn [[_k v]] (and (:exposed v) (:mined v) )) app-state)
+      :dead
+      (if (every? (fn [[_k v]] (or (:exposed v) (:mined v))) app-state)
+          :win
+          :in-progress
+      )
+  )
 )
 
-; render UI
+(defn message [app-state]
+  (case (game-status app-state)
+    :dead "Fuck. You blew up."
+    :win "Congratulations!"
+    :in-progress "Tread lightly")
+)
 
 (defn get-app-element []
   (gdom/getElement "app"))
@@ -96,15 +111,9 @@
     :y (+ 0.05 y)
     :on-click
     (fn blank-click [e]
-      (when (= (:game-status @app-state) :in-progress)
-        (update-board! [x y])
-        (if (win?)
-             (do (swap! app-state assoc :game-status :win)
-                     (swap! app-state assoc :message "Congratulations!")))
-        (if (= 1 (get (:matrix @app-state) [x y]))
-          (do (swap! app-state assoc :game-status :dead)
-            (swap! app-state assoc :message "Fuck. You blew up."))
-        )))}])
+      (when (= (game-status @app-state) :in-progress)
+        (reset! app-state (flood @app-state [x y]))
+        ))}])
 
 (defn rect-cell
   [x y]
@@ -121,9 +130,9 @@
     :y (+ 0.72 y) :height 1
     :text-anchor "middle"
     :font-size 0.6}
-   (if (zero? (mine-detector x y))
+   (if (zero? (mine-detector @app-state x y))
      ""
-     (str (mine-detector x y)))])
+     (str (mine-detector @app-state x y)))])
 
 (defn cross [i j]
   [:g {:stroke "darkred"
@@ -145,23 +154,19 @@
           j (range board-height)]
       [:g
        [rect-cell i j]
-       (if (some #{[i j]} (:stepped @app-state))
-         (if (= 1 (get (:matrix @app-state) [i j]))
+       (if (:exposed (get @app-state [i j]))
+         (if (:mined (get @app-state [i j]))
            [cross i j]
            [text-cell i j])      
          [blank i j])])))
 
 (defn minesweeper []
   [:center
-   [:h1 (:message @app-state)]
+   [:h1 (message @app-state)]
    [:button
     {:on-click
      (fn new-game-click [e]
-       (swap! app-state assoc
-              :matrix (init-matrix)
-              :message "Welcome back"
-              :game-status :in-progress
-              :stepped #{}) )}
+       (reset! app-state (init-matrix)) )}
     "Reset"]
    [:div [render-board]]])
 
