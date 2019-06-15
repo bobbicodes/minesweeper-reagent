@@ -41,12 +41,8 @@
 
 ; remove invalid and duplicate squares
 
-(defn valid-square? [[x y]]
-  (and (<= 0 x (dec board-width))
-             (<= 0 y (dec board-height))))
-
-(defn adjacents [[x y]]
-    (filter valid-square? 
+(defn adjacents [app-state [x y]]
+    (filter (partial contains? app-state)
                #{ [(dec x) (dec y)]
                   [x (dec y)]
                   [x (inc y)]
@@ -61,7 +57,7 @@
 )
 
 (defn mine-detector [app-state x y]
-  (reduce + 0 (map (partial mine-count app-state) (adjacents [x y]))))
+  (reduce + 0 (map (partial mine-count app-state) (adjacents app-state [x y]))))
 
 (defn clear? [app-state x y]
   (zero? (mine-detector app-state x y)))
@@ -73,7 +69,7 @@
       (let [new-app-state (assoc app-state [x y] (assoc cell :exposed true))]
         (if (or (:mined cell) (not (clear? app-state x y)))
             new-app-state
-            (reduce flood new-app-state (adjacents [x y]))
+            (reduce flood new-app-state (adjacents app-state [x y]))
         )
       )
     )
