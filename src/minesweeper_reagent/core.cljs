@@ -33,13 +33,7 @@
 
 (def app-state (atom (init-matrix)))
 
-; mine-detector
-
-(defn mine? [app-state pos]
-  (:mined (get app-state pos))
-)
-
-; remove invalid and duplicate squares
+; remove invalid squares
 
 (defn adjacents [app-state [x y]]
     (filter (partial contains? app-state)
@@ -53,7 +47,7 @@
                   [(dec x) (inc y)] }))
 
 (defn mine-count [app-state pos]
-  (if (mine? app-state pos) 1 0)
+  (if (:mined (get app-state pos)) 1 0)
 )
 
 (defn mine-detector [app-state pos]
