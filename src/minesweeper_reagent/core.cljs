@@ -53,15 +53,12 @@
 (defn mine-detector [app-state pos]
   (reduce + 0 (map (partial mine-count app-state) (adjacents app-state pos))))
 
-(defn clear? [app-state pos]
-  (zero? (mine-detector app-state pos)))
-
 (defn flood [app-state pos]
   (let [cell (get app-state pos)]
     (if (:exposed cell)
       app-state
       (let [new-app-state (assoc app-state pos (assoc cell :exposed true))]
-        (if (or (:mined cell) (not (clear? app-state pos)))
+        (if (or (:mined cell) (< 0 (mine-detector app-state pos)))
             new-app-state
             (reduce flood new-app-state (adjacents app-state pos))
         )
