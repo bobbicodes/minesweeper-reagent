@@ -35,7 +35,7 @@
 
 ; mine-detector
 
-(defn mine? [app-state x y]
+(defn mine? [app-state [x y]]
   (:mined (get app-state [x y]))
 )
 
@@ -53,21 +53,21 @@
                   [(dec x) (inc y)] }))
 
 (defn mine-count [app-state [x y]]
-  (if (mine? app-state x y) 1 0)
+  (if (mine? app-state [x y]) 1 0)
 )
 
-(defn mine-detector [app-state x y]
+(defn mine-detector [app-state [x y]]
   (reduce + 0 (map (partial mine-count app-state) (adjacents app-state [x y]))))
 
-(defn clear? [app-state x y]
-  (zero? (mine-detector app-state x y)))
+(defn clear? [app-state [x y]]
+  (zero? (mine-detector app-state [x y])))
 
 (defn flood [app-state [x y]]
   (let [cell (get app-state [x y])]
     (if (:exposed cell)
       app-state
       (let [new-app-state (assoc app-state [x y] (assoc cell :exposed true))]
-        (if (or (:mined cell) (not (clear? app-state x y)))
+        (if (or (:mined cell) (not (clear? app-state [x y])))
             new-app-state
             (reduce flood new-app-state (adjacents app-state [x y]))
         )
@@ -98,7 +98,7 @@
 (defn get-app-element []
   (gdom/getElement "app"))
 
-(defn blank [x y]
+(defn blank [[x y]]
   [:rect
    {:width 0.9
     :height 0.9
@@ -111,8 +111,7 @@
         (reset! app-state (flood @app-state [x y]))
         ))}])
 
-(defn rect-cell
-  [x y]
+(defn rect-cell [[x y]]
   [:rect.cell
    {:x (+ 0.05 x) :width 0.9
     :y (+ 0.05 y) :height 0.9
@@ -120,17 +119,17 @@
     :stroke-width 0.025
     :stroke "black"}])
 
-(defn text-cell [x y]
+(defn text-cell [[x y]]
   [:text
    {:x (+ 0.5 x) :width 1
     :y (+ 0.72 y) :height 1
     :text-anchor "middle"
     :font-size 0.6}
-   (if (zero? (mine-detector @app-state x y))
+   (if (zero? (mine-detector @app-state [x y]))
      ""
-     (str (mine-detector @app-state x y)))])
+     (str (mine-detector @app-state [x y])))])
 
-(defn cross [i j]
+(defn cross [[i j]]
   [:g {:stroke "darkred"
        :stroke-width 0.4
        :stroke-linecap "round"
@@ -149,12 +148,12 @@
     (for [i (range board-width)
           j (range board-height)]
       [:g
-       [rect-cell i j]
+       [rect-cell [i j]]
        (if (:exposed (get @app-state [i j]))
          (if (:mined (get @app-state [i j]))
-           [cross i j]
-           [text-cell i j])      
-         [blank i j])])))
+           [cross [i j]]
+           [text-cell [i j]])      
+         [blank [i j]])])))
 
 (defn minesweeper []
   [:center
