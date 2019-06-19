@@ -36,15 +36,12 @@
 ; remove invalid squares
 
 (defn adjacents [app-state [x y]]
-    (filter (partial contains? app-state)
-               #{ [(dec x) (dec y)]
-                  [x (dec y)]
-                  [x (inc y)]
-                  [(dec x) y]
-                  [(inc x) y] 
-                  [(inc x) (dec y)]
-                  [(inc x) (inc y)]
-                  [(dec x) (inc y)] }))
+  (filter (partial contains? app-state)
+    (for [i [-1 0 1] j [-1 0 1] :when (or i j)]
+      [(+ x i) (+ y j)]  
+    )
+  )
+)
 
 (defn mine-count [app-state pos]
   (if (:mined (get app-state pos)) 1 0)
