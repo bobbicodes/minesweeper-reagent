@@ -12,18 +12,14 @@
           j (range board-height)]
       [i j])))
 
-(defn init-square [mine] 
-  {
-   :mined mine
-   :exposed false
-  }
-)
-
 (defn set-mines [] 
-  (loop [squares (repeat num-mines (init-square true))]
-    (if (= (count squares) (* board-width board-height))
-      squares
-      (recur (conj squares (init-square false))))))
+    (for [i (range (* board-height board-width))]
+      {
+       :mined (< i num-mines)
+       :exposed false
+      }
+    )
+)
 
 (defn init-matrix []
   (into {}
