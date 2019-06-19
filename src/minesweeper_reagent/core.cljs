@@ -89,7 +89,7 @@
 (defn get-app-element []
   (gdom/getElement "app"))
 
-(defn blank [[x y]]
+(defn blank [app-state [x y]]
   [:rect
    {:width 0.9
     :height 0.9
@@ -98,8 +98,8 @@
     :y (+ 0.05 y)
     :on-click
     (fn blank-click [e]
-      (when (= (game-status @atom-app-state) :in-progress)
-        (reset! atom-app-state (flood @atom-app-state [x y]))
+      (when (= (game-status app-state) :in-progress)
+        (reset! atom-app-state (flood app-state [x y]))
         ))}])
 
 (defn rect-cell [[x y]]
@@ -110,15 +110,15 @@
     :stroke-width 0.025
     :stroke "black"}])
 
-(defn text-cell [[x y]]
+(defn text-cell [app-state [x y]]
   [:text
    {:x (+ 0.5 x) :width 1
     :y (+ 0.72 y) :height 1
     :text-anchor "middle"
     :font-size 0.6}
-   (if (zero? (mine-detector @atom-app-state [x y]))
+   (if (zero? (mine-detector app-state [x y]))
      ""
-     (str (mine-detector @atom-app-state [x y])))])
+     (str (mine-detector app-state [x y])))])
 
 (defn cross [[i j]]
   [:g {:stroke "darkred"
@@ -142,9 +142,9 @@
        (if (:exposed condition)
          (if (:mined condition)
            [cross pos]
-           [text-cell pos]
+           [text-cell app-state pos]
          )
-         [blank pos]
+         [blank app-state pos]
        )])))
 
 (defn minesweeper []
