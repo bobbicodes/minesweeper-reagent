@@ -33,10 +33,8 @@
 
 (def atom-app-state (atom (init-matrix)))
 
-; remove invalid squares
-
 (defn adjacents [app-state [x y]]
-  (filter (partial contains? app-state)
+  (filter (partial contains? app-state) ; remove invalid squares
     (for [i [-1 0 1] j [-1 0 1] :when (or i j)]
       [(+ x i) (+ y j)]  
     )
@@ -64,8 +62,6 @@
   )
 )
 
-; render UI
-
 (defn game-status [app-state]
   (if (some (fn [[_k v]] (and (:exposed v) (:mined v) )) app-state)
       :dead
@@ -76,15 +72,14 @@
   )
 )
 
+; render UI
+
 (defn message [app-state]
   (case (game-status app-state)
     :dead "Fuck. You blew up."
     :win "Congratulations!"
     :in-progress "Tread lightly")
 )
-
-(defn get-app-element []
-  (gdom/getElement "app"))
 
 (defn blank [app-state [x y]]
   [:rect
@@ -154,12 +149,9 @@
     "Reset"]
    [:div [render-board @atom-app-state]]])
 
-(defn mount [el]
-  (reagent/render-component [minesweeper] el))
-
 (defn mount-app-element []
-  (when-let [el (get-app-element)]
-    (mount el)))
+  (when-let [el (gdom/getElement "app")]
+    (reagent/render-component [minesweeper] el)))
 
 ;; conditionally start your application based on the presence of an "app" element
 ;; this is particularly helpful for testing this ns without launching the app
