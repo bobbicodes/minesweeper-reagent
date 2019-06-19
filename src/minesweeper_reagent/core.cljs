@@ -12,18 +12,14 @@
           j (range board-height)]
       [i j])))
 
-(defn init-square [mine] 
-  {
-   :mined mine
-   :exposed false
-  }
-)
-
 (defn set-mines [] 
-  (loop [squares (repeat num-mines (init-square true))]
-    (if (= (count squares) (* board-width board-height))
-      squares
-      (recur (conj squares (init-square false))))))
+    (for [i (range (* board-height board-width))]
+      {
+       :mined (< i num-mines)
+       :exposed false
+      }
+    )
+)
 
 (defn init-matrix []
   (into {}
@@ -31,56 +27,36 @@
              (rand-positions)
              (set-mines))))
 
-(def app-state (atom (init-matrix)))
+(def atom-app-state (atom (init-matrix)))
 
-; mine-detector
-
-(defn mine? [app-state x y]
-  (:mined (get app-state [x y]))
+(defn adjacents [app-state [x y]]
+  (filter (partial contains? app-state) ; remove invalid squares
+    (for [i [-1 0 1] j [-1 0 1] :when (or i j)]
+      [(+ x i) (+ y j)]  
+    )
+  )
 )
 
-; remove invalid and duplicate squares
-
-(defn valid-square? [[x y]]
-  (and (<= 0 x (dec board-width))
-             (<= 0 y (dec board-height))))
-
-(defn adjacents [[x y]]
-    (filter valid-square? 
-               #{ [(dec x) (dec y)]
-                  [x (dec y)]
-                  [x (inc y)]
-                  [(dec x) y]
-                  [(inc x) y] 
-                  [(inc x) (dec y)]
-                  [(inc x) (inc y)]
-                  [(dec x) (inc y)] }))
-
-(defn mine-count [app-state [x y]]
-  (if (mine? app-state x y) 1 0)
+(defn mine-count [app-state pos]
+  (if (:mined (get app-state pos)) 1 0)
 )
 
-(defn mine-detector [app-state x y]
-  (reduce + 0 (map (partial mine-count app-state) (adjacents [x y]))))
+(defn mine-detector [app-state pos]
+  (reduce + (map (partial mine-count app-state) (adjacents app-state pos))))
 
-(defn clear? [app-state x y]
-  (zero? (mine-detector app-state x y)))
-
-(defn flood [app-state [x y]]
-  (let [cell (get app-state [x y])]
+(defn flood [app-state pos]
+  (let [cell (get app-state pos)]
     (if (:exposed cell)
       app-state
-      (let [new-app-state (assoc app-state [x y] (assoc cell :exposed true))]
-        (if (or (:mined cell) (not (clear? app-state x y)))
+      (let [new-app-state (assoc app-state pos (assoc cell :exposed true))]
+        (if (or (:mined cell) (< 0 (mine-detector app-state pos)))
             new-app-state
-            (reduce flood new-app-state (adjacents [x y]))
+            (reduce flood new-app-state (adjacents app-state pos))
         )
       )
     )
   )
 )
-
-; render UI
 
 (defn game-status [app-state]
   (if (some (fn [[_k v]] (and (:exposed v) (:mined v) )) app-state)
@@ -92,6 +68,8 @@
   )
 )
 
+; render UI
+
 (defn message [app-state]
   (case (game-status app-state)
     :dead "Fuck. You blew up."
@@ -99,10 +77,7 @@
     :in-progress "Tread lightly")
 )
 
-(defn get-app-element []
-  (gdom/getElement "app"))
-
-(defn blank [x y]
+(defn blank [app-state [x y]]
   [:rect
    {:width 0.9
     :height 0.9
@@ -111,12 +86,11 @@
     :y (+ 0.05 y)
     :on-click
     (fn blank-click [e]
-      (when (= (game-status @app-state) :in-progress)
-        (reset! app-state (flood @app-state [x y]))
+      (when (= (game-status app-state) :in-progress)
+        (reset! atom-app-state (flood app-state [x y]))
         ))}])
 
-(defn rect-cell
-  [x y]
+(defn rect-cell [[x y]]
   [:rect.cell
    {:x (+ 0.05 x) :width 0.9
     :y (+ 0.05 y) :height 0.9
@@ -124,17 +98,17 @@
     :stroke-width 0.025
     :stroke "black"}])
 
-(defn text-cell [x y]
+(defn text-cell [app-state [x y]]
   [:text
    {:x (+ 0.5 x) :width 1
     :y (+ 0.72 y) :height 1
     :text-anchor "middle"
     :font-size 0.6}
-   (if (zero? (mine-detector @app-state x y))
+   (if (zero? (mine-detector app-state [x y]))
      ""
-     (str (mine-detector @app-state x y)))])
+     (str (mine-detector app-state [x y])))])
 
-(defn cross [i j]
+(defn cross [[i j]]
   [:g {:stroke "darkred"
        :stroke-width 0.4
        :stroke-linecap "round"
@@ -144,38 +118,36 @@
    [:line {:x1 -1 :y1 -1 :x2 1 :y2 1}]
    [:line {:x1 1 :y1 -1 :x2 -1 :y2 1}]])
 
-(defn render-board []
+(defn render-board [app-state]
   (into
     [:svg.board
      {:view-box (str "0 0 " board-width " " board-height)
       :shape-rendering "auto"
       :style {:max-height "500px"}}]
-    (for [i (range board-width)
-          j (range board-height)]
+    ( for [[pos condition] app-state]
       [:g
-       [rect-cell i j]
-       (if (:exposed (get @app-state [i j]))
-         (if (:mined (get @app-state [i j]))
-           [cross i j]
-           [text-cell i j])      
-         [blank i j])])))
+       [rect-cell pos]
+       (if (:exposed condition)
+         (if (:mined condition)
+           [cross pos]
+           [text-cell app-state pos]
+         )
+         [blank app-state pos]
+       )])))
 
 (defn minesweeper []
   [:center
-   [:h1 (message @app-state)]
+   [:h1 (message @atom-app-state)]
    [:button
     {:on-click
      (fn new-game-click [e]
-       (reset! app-state (init-matrix)) )}
+       (reset! atom-app-state (init-matrix)) )}
     "Reset"]
-   [:div [render-board]]])
-
-(defn mount [el]
-  (reagent/render-component [minesweeper] el))
+   [:div [render-board @atom-app-state]]])
 
 (defn mount-app-element []
-  (when-let [el (get-app-element)]
-    (mount el)))
+  (when-let [el (gdom/getElement "app")]
+    (reagent/render-component [minesweeper] el)))
 
 ;; conditionally start your application based on the presence of an "app" element
 ;; this is particularly helpful for testing this ns without launching the app
