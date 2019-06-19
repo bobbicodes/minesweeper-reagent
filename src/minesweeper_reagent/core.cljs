@@ -46,7 +46,7 @@
 )
 
 (defn mine-detector [app-state pos]
-  (reduce + 0 (map (partial mine-count app-state) (adjacents app-state pos))))
+  (reduce + (map (partial mine-count app-state) (adjacents app-state pos))))
 
 (defn flood [app-state pos]
   (let [cell (get app-state pos)]
