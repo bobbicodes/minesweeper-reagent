@@ -133,21 +133,22 @@
    [:line {:x1 -1 :y1 -1 :x2 1 :y2 1}]
    [:line {:x1 1 :y1 -1 :x2 -1 :y2 1}]])
 
-(defn render-board []
+(defn render-board [app-state]
   (into
     [:svg.board
      {:view-box (str "0 0 " board-width " " board-height)
       :shape-rendering "auto"
       :style {:max-height "500px"}}]
-    (for [i (range board-width)
-          j (range board-height)]
+    ( for [[pos condition] app-state]
       [:g
-       [rect-cell [i j]]
-       (if (:exposed (get @app-state [i j]))
-         (if (:mined (get @app-state [i j]))
-           [cross [i j]]
-           [text-cell [i j]])      
-         [blank [i j]])])))
+       [rect-cell pos]
+       (if (:exposed condition)
+         (if (:mined condition)
+           [cross pos]
+           [text-cell pos]
+         )
+         [blank pos]
+       )])))
 
 (defn minesweeper []
   [:center
@@ -157,7 +158,7 @@
      (fn new-game-click [e]
        (reset! app-state (init-matrix)) )}
     "Reset"]
-   [:div [render-board]]])
+   [:div [render-board @app-state]]])
 
 (defn mount [el]
   (reagent/render-component [minesweeper] el))
