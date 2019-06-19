@@ -31,7 +31,7 @@
              (rand-positions)
              (set-mines))))
 
-(def app-state (atom (init-matrix)))
+(def atom-app-state (atom (init-matrix)))
 
 ; remove invalid squares
 
@@ -98,8 +98,8 @@
     :y (+ 0.05 y)
     :on-click
     (fn blank-click [e]
-      (when (= (game-status @app-state) :in-progress)
-        (reset! app-state (flood @app-state [x y]))
+      (when (= (game-status @atom-app-state) :in-progress)
+        (reset! atom-app-state (flood @atom-app-state [x y]))
         ))}])
 
 (defn rect-cell [[x y]]
@@ -116,9 +116,9 @@
     :y (+ 0.72 y) :height 1
     :text-anchor "middle"
     :font-size 0.6}
-   (if (zero? (mine-detector @app-state [x y]))
+   (if (zero? (mine-detector @atom-app-state [x y]))
      ""
-     (str (mine-detector @app-state [x y])))])
+     (str (mine-detector @atom-app-state [x y])))])
 
 (defn cross [[i j]]
   [:g {:stroke "darkred"
@@ -149,13 +149,13 @@
 
 (defn minesweeper []
   [:center
-   [:h1 (message @app-state)]
+   [:h1 (message @atom-app-state)]
    [:button
     {:on-click
      (fn new-game-click [e]
-       (reset! app-state (init-matrix)) )}
+       (reset! atom-app-state (init-matrix)) )}
     "Reset"]
-   [:div [render-board @app-state]]])
+   [:div [render-board @atom-app-state]]])
 
 (defn mount [el]
   (reagent/render-component [minesweeper] el))
