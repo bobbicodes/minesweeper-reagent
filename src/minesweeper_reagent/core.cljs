@@ -64,7 +64,7 @@
     :dead
     (every? (fn [[_k v]] (or (:exposed v) (:mined v))) app-state)
     :win
-    (some true? (map #(:exposed (second %)) app-state))
+    (some (fn [[_k v]] (:exposed v)) app-state)
     :in-progress
     :else :new))
 
