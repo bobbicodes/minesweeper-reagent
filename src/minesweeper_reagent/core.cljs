@@ -59,14 +59,14 @@
 )
 
 (defn game-status [app-state]
-  (if (some (fn [[_k v]] (and (:exposed v) (:mined v) )) app-state)
-      :dead
-      (if (every? (fn [[_k v]] (or (:exposed v) (:mined v))) app-state)
-          :win
-          :in-progress
-      )
-  )
-)
+  (cond
+    (some (fn [[_k v]] (and (:exposed v) (:mined v))) app-state)
+    :dead
+    (every? (fn [[_k v]] (or (:exposed v) (:mined v))) app-state)
+    :win
+    (some true? (map #(:exposed (second %)) app-state))
+    :in-progress
+    :else :new))
 
 ; render UI
 
@@ -74,8 +74,7 @@
   (case (game-status app-state)
     :dead "Fuck. You blew up."
     :win "Congratulations!"
-    :in-progress "Tread lightly")
-)
+    "Tread lightly..."))
 
 (defn blank [app-state [x y]]
   [:rect
@@ -86,9 +85,10 @@
     :y (+ 0.05 y)
     :on-click
     (fn blank-click [e]
+      (if (= (game-status app-state) :new)
+        (reset! atom-app-state (flood (assoc app-state [x y] {:mined false :exposed false}) [x y])))
       (when (= (game-status app-state) :in-progress)
-        (reset! atom-app-state (flood app-state [x y]))
-        ))}])
+        (reset! atom-app-state (flood app-state [x y]))))}])
 
 (defn rect-cell [[x y]]
   [:rect.cell
