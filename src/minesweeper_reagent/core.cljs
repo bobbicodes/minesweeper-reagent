@@ -76,47 +76,44 @@
     :win "Congratulations!"
     "Tread lightly..."))
 
-(defn blank [app-state [x y]]
+(defn rect-cell [app-state pos condition]
   [:rect
-   {:width 0.9
-    :height 0.9
-    :fill "grey"
-    :x (+ 0.05 x)
-    :y (+ 0.05 y)
-    :on-click
-    (fn blank-click [e]
-      (if (= (game-status app-state) :new)
-        (reset! atom-app-state (flood (assoc app-state [x y] {:mined false :exposed false}) [x y])))
-      (when (= (game-status app-state) :in-progress)
-        (reset! atom-app-state (flood app-state [x y]))))}])
+   (merge
+    {:width 1.8
+     :height 1.8
+     :x -0.9
+     :y -0.9 
+     :stroke-width 0.08
+     :stroke "black"
+     :fill (if (:exposed condition) "white" "grey")
+    }
+    (let [gstat (game-status app-state)]
+         (when (or (=  gstat :in-progress) (=  gstat :new))
+           { :on-click #(reset! atom-app-state (flood app-state pos)) }
+         )
+    )
+   )
+  ]
+)
 
-(defn rect-cell [[x y]]
-  [:rect.cell
-   {:x (+ 0.05 x) :width 0.9
-    :y (+ 0.05 y) :height 0.9
-    :fill "white"
-    :stroke-width 0.025
-    :stroke "black"}])
+(defn text-cell [detected-text]
+   [:text
+    {:y 0.5
+     :text-anchor "middle"
+     :font-size 1.5
+    }
+    detected-text
+   ]
+)
 
-(defn text-cell [app-state [x y]]
-  [:text
-   {:x (+ 0.5 x) :width 1
-    :y (+ 0.72 y) :height 1
-    :text-anchor "middle"
-    :font-size 0.6}
-   (if (zero? (mine-detector app-state [x y]))
-     ""
-     (str (mine-detector app-state [x y])))])
-
-(defn cross [[i j]]
+(defn cross []
   [:g {:stroke "darkred"
-       :stroke-width 0.4
+       :stroke-width 0.2
        :stroke-linecap "round"
-       :transform
-       (str "translate(" (+ 0.5 i) "," (+ 0.5 j) ") "
-            "scale(0.3)")}
-   [:line {:x1 -1 :y1 -1 :x2 1 :y2 1}]
-   [:line {:x1 1 :y1 -1 :x2 -1 :y2 1}]])
+       }
+   [:line {:x1 -0.6 :y1 -0.6 :x2 0.6 :y2 0.6}]
+   [:line {:x1 0.6 :y1 -0.6 :x2 -0.6 :y2 0.6}]])
+
 
 (defn render-board [app-state]
   (into
@@ -124,16 +121,24 @@
      {:view-box (str "0 0 " board-width " " board-height)
       :shape-rendering "auto"
       :style {:max-height "500px"}}]
-    ( for [[pos condition] app-state]
-      [:g
-       [rect-cell pos]
-       (if (:exposed condition)
-         (if (:mined condition)
-           [cross pos]
-           [text-cell app-state pos]
-         )
-         [blank app-state pos]
-       )])))
+    ( for [[[i j] condition] app-state]
+      [:g {:transform (str "translate(" i  "," j ") " 
+                           "scale (0.5)" 
+                           "translate(1,1)")
+          }
+          [rect-cell app-state [i j] condition]
+          (when (:exposed condition)
+              (if (:mined condition)
+                  [cross]
+                  (let [detected (mine-detector app-state [i j])]
+                       (if (< 0 detected) 
+                           [text-cell (str detected)]))
+              )
+          )
+      ]
+    )
+  )
+)
 
 (defn minesweeper []
   [:center
