@@ -71,6 +71,9 @@
 (defn flag [[x y]]
   (reset! atom-app-state (assoc @atom-app-state [x y] (assoc-in (get @atom-app-state [x y]) [:flagged] true))))
 
+(defn unflag [[x y]]
+  (reset! atom-app-state (assoc @atom-app-state [x y] (assoc-in (get @atom-app-state [x y]) [:flagged] false))))
+
 (defn rect-cell [app-state pos condition]
   [:rect
    {:width 1.8
@@ -91,7 +94,9 @@
 
        :in-progress
        (reset! atom-app-state (flood app-state pos))))
-    :on-contextMenu (fn [e] (do (.preventDefault e) (flag pos)))}])
+    :on-contextMenu (fn [e] (do (.preventDefault e) (if (= (:flagged condition) true)
+                                                      (unflag pos)
+                                                      (flag pos))))}])
 
 (defn text-cell [detected-text]
   [:text
