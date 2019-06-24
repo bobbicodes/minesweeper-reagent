@@ -13,8 +13,7 @@
 
 (defn rand-positions []
   (shuffle
-   (for [i (range board-width)
-         j (range board-height)]
+   (for [i (range board-width) j (range board-height)]
      [i j])))
 
 (defn set-mines []
@@ -78,38 +77,38 @@
 
 (defn rect-cell [app-state pos condition]
   [:rect
-   {:width 1.85
-    :height 1.85
+   {:width 1.9
+    :height 1.9
     :x -0.9
     :y -0.9
+    :rx 0.25
     :stroke-width (if (= pos @mouse-over-cell)
                     0.1 0.08)
     :stroke "black"
     :fill (cond
             (:exposed condition) "white"
             (:flagged condition) "red"
-            (= pos @mouse-over-cell) "darkgrey"
-            :else "silver")
+            (= pos @mouse-over-cell) "grey"
+            :else "darkgrey")
     :on-mouse-over
-(fn mouse-over-square [e]
-  (reset! mouse-over-cell pos))
+    (fn mouse-over-square [e]
+      (reset! mouse-over-cell pos))
     :on-click
     #(when (not= (:flagged condition) true)
-       (case (game-status app-state)
+       (case
+        (game-status app-state)
          :new
          (reset! atom-app-state (flood (assoc app-state pos {:mined false :exposed false}) pos))
-
          :in-progress
          (reset! atom-app-state (flood app-state pos))))
     :on-contextMenu (fn [e] (do (.preventDefault e) (if (= (:flagged condition) true)
-                                                      (unflag pos)
-                                                      (flag pos))))}])
+                                                      (unflag pos) (flag pos))))}])
 
 (defn text-cell [detected-text]
   [:text
    {:y 0.5
     :text-anchor "middle"
-    :font-size 1.5}
+    :font-size 1.25}
    detected-text])
 
 (defn cross []
