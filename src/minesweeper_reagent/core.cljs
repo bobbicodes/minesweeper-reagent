@@ -93,6 +93,7 @@
          :in-progress 
              (reset! atom-app-state (flood app-state pos))
        )
+     :on-contextMenu (fn [e] (do (.preventDefault e) (prn "hi")))
     }
   ]
 )
