@@ -68,6 +68,8 @@
     :win "Congratulations!"
     "Tread lightly..."))
 
+(def mouse-over-cell (atom nil))
+
 (defn flag [[x y]]
   (reset! atom-app-state (assoc @atom-app-state [x y] (assoc-in (get @atom-app-state [x y]) [:flagged] true))))
 
@@ -76,24 +78,29 @@
 
 (defn rect-cell [app-state pos condition]
   [:rect
-   {:width 1.8
-    :height 1.8
+   {:width 1.85
+    :height 1.85
     :x -0.9
     :y -0.9
-    :stroke-width 0.08
+    :stroke-width (if (= pos @mouse-over-cell)
+                    0.1 0.08)
     :stroke "black"
     :fill (cond
             (:exposed condition) "white"
             (:flagged condition) "red"
-            :else "grey")
+            (= pos @mouse-over-cell) "darkgrey"
+            :else "silver")
+    :on-mouse-over
+(fn mouse-over-square [e]
+  (reset! mouse-over-cell pos))
     :on-click
     #(when (not= (:flagged condition) true)
-        (case (game-status app-state)
-      :new
-       (reset! atom-app-state (flood (assoc app-state pos {:mined false :exposed false}) pos))
+       (case (game-status app-state)
+         :new
+         (reset! atom-app-state (flood (assoc app-state pos {:mined false :exposed false}) pos))
 
-       :in-progress
-       (reset! atom-app-state (flood app-state pos))))
+         :in-progress
+         (reset! atom-app-state (flood app-state pos))))
     :on-contextMenu (fn [e] (do (.preventDefault e) (if (= (:flagged condition) true)
                                                       (unflag pos)
                                                       (flag pos))))}])
