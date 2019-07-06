@@ -3,10 +3,6 @@
    [goog.dom :as gdom]
    [reagent.core :as reagent :refer [atom]]))
 
-(println "This text is printed from src/minesweeper_reagent/core.cljs. Go ahead and edit it and see reloading in action.")
-
-(defn multiply [a b] (* a b))
-
 (def board-width 12)
 (def board-height 12)
 (def num-mines 18)
@@ -63,9 +59,9 @@
 
 (defn message [app-state]
   (case (game-status app-state)
-    :dead "Fuck. You blew up."
-    :win "Congratulations!"
-    "Tread lightly..."))
+    :dead "🤯"
+    :win "🤓"
+    "🥺"))
 
 (def mouse-over-cell (atom nil))
 
@@ -86,7 +82,6 @@
     :stroke "black"
     :fill (cond
             (:exposed condition) "white"
-            (:flagged condition) "red"
             (= pos @mouse-over-cell) "darkgrey"
             :else "silver")
     :on-mouse-over
@@ -100,15 +95,18 @@
 
          :in-progress
          (reset! atom-app-state (flood app-state pos))))
-    :on-contextMenu (fn [e] (do (.preventDefault e) (if (= (:flagged condition) true)
-                                                      (unflag pos)
-                                                      (flag pos))))}])
+    :on-contextMenu
+    (fn [e]
+      (do (.preventDefault e)
+        (if (:flagged condition)
+          (unflag pos)
+          (flag pos))))}])
 
 (defn text-cell [detected-text]
   [:text
    {:y 0.5
     :text-anchor "middle"
-    :font-weight "bold"
+    :font-weight "900"
     :fill (case detected-text
             "1" "blue"
             "2" "green"
@@ -116,16 +114,29 @@
             "4" "purple"
             "5" "brown"
             "black")
-    :font-size 1.25}
+    :font-size "1.25"}
    detected-text])
 
-(defn cross []
-  [:g {:stroke "darkred"
-       :stroke-width 0.2
-       :stroke-linecap "round"}
-   [:line {:x1 -0.6 :y1 -0.6 :x2 0.6 :y2 0.6}]
-   [:line {:x1 0.6 :y1 -0.6 :x2 -0.6 :y2 0.6}]])
+(defn bomb []
+  [:text
+   {:y 0.5
+    :text-anchor "middle"
+    :font-weight "900"
+    :font-size "1.25"}
+   "💥"])
 
+(defn flagged [pos]
+  [:text
+   {:y 0.5
+    :text-anchor "middle"
+    :font-size "1.5"
+    :on-contextMenu
+    (fn [e]
+      (let [condition (get @atom-app-state pos)]
+        (do (.preventDefault e)
+          (if (:flagged condition)
+            (unflag pos)))))}
+   "☠️"])
 
 (defn render-board [app-state]
   (into
@@ -138,9 +149,9 @@
                           "scale (0.5)"
                           "translate(1,1)")}
       [rect-cell app-state [i j] condition]
+      (if (:flagged condition) [flagged [i j]])
       (when (:exposed condition)
-        (if (:mined condition)
-          [cross]
+        (if (:mined condition) [bomb]
           (let [detected (mine-detector app-state [i j])]
             (if (< 0 detected)
               [text-cell (str detected)]))))])))
