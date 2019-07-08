@@ -59,6 +59,10 @@
 (defn unflag! [[x y]]
   (swap! app-state assoc-in [[x y] :flagged] false))
 
+(defn step! [[x y]]
+  (when (not (:flagged (get @app-state [x y])))
+    (reset! app-state (step @app-state [x y]))))
+
 (defn rect-cell [[x y]]
   [:rect
    {:width 1.85 :height 1.85
@@ -82,13 +86,13 @@
          (swap! app-state step [x y])))
     :on-contextMenu
     #(do (.preventDefault %)
-         (if (:flagged (get @app-state [x y]))
+         (cond
+           (:exposed (get @app-state [x y]))
+           (run! step! (neighbors [x y]))
+           (:flagged (get @app-state [x y]))
            (unflag! [x y])
+           :else
            (flag! [x y])))}])
-
-(defn step! [[x y]]
-  (when (not (:flagged (get @app-state [x y])))
-    (reset! app-state (step @app-state [x y]))))
 
 (defn mine-num [[x y]]
   [:text
