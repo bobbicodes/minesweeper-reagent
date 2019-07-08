@@ -17,113 +17,96 @@
     {:mined (< i num-mines)
      :exposed false}))
 
-(defn init-matrix []
-  (into {}
-        (map vector
-             (rand-positions)
-             (set-mines))))
+(def app-state
+  (atom (into {} (map vector (rand-positions) (set-mines)))))
 
-(def atom-app-state (atom (init-matrix)))
-
-(defn adjacents [app-state [x y]]
-  (filter (partial contains? app-state) ; remove invalid squares
+(defn neighbors [[x y]]
+  (filter (partial contains? @app-state) ; remove invalid squares
           (for [i [-1 0 1] j [-1 0 1] :when (or i j)]
             [(+ x i) (+ y j)])))
 
-(defn mine-count [app-state pos]
-  (if (:mined (get app-state pos)) 1 0))
+(defn mine-count [[x y]]
+  (if (:mined (get @app-state [x y])) 1 0))
 
-(defn mine-detector [app-state pos]
-  (reduce + (map (partial mine-count app-state)
-                 (adjacents app-state pos))))
+(defn mine-detector [[x y]]
+  (reduce + (map (partial mine-count)
+                 (neighbors [x y]))))
 
-(defn flood [app-state pos]
-  (let [cell (get app-state pos)]
-    (if (:exposed cell)
-      app-state
-      (let [new-app-state (assoc app-state pos (assoc cell :exposed true))]
-        (if (or (:mined cell) (< 0 (mine-detector app-state pos)))
-          new-app-state
-          (reduce flood new-app-state (adjacents app-state pos)))))))
+(defn step [grid [x y]]
+  (let [square (get grid [x y])
+        step-square (assoc-in grid [[x y] :exposed] true)]
+    (cond
+      (:exposed square) grid
+      (or (:mined square) (< 0 (mine-detector [x y]))) step-square
+      :else (reduce step step-square (neighbors [x y])))))
 
-(defn game-status [app-state]
+(defn game-status []
   (cond
-    (some (fn [[_k v]] (and (:exposed v) (:mined v))) app-state)
-    :dead
-    (every? (fn [[_k v]] (or (:exposed v) (:mined v))) app-state)
-    :win
-    (some (fn [[_k v]] (:exposed v)) app-state)
-    :in-progress
+    (some (fn [[_k v]] (and (:exposed v) (:mined v))) @app-state) :dead
+    (every? (fn [[_k v]] (or (:exposed v) (:mined v))) @app-state) :win
+    (some (fn [[_k v]] (:exposed v)) @app-state) :in-progress
     :else :new))
 
-; render UI
-
-(defn message [app-state]
-  (case (game-status app-state)
-    :dead "🤯"
-    :win "🤓"
-    "🥺"))
+(defn icon []
+  (case (game-status) :dead "🤯" :win "🤓" "🥺"))
 
 (def mouse-over-cell (atom nil))
 
-(defn flag [[x y]]
-  (reset! atom-app-state (assoc @atom-app-state [x y] (assoc-in (get @atom-app-state [x y]) [:flagged] true))))
+(defn flag! [[x y]]
+  (when (not (:exposed (get @app-state [x y])))
+  (swap! app-state assoc-in [[x y] :flagged] true)))
 
-(defn unflag [[x y]]
-  (reset! atom-app-state (assoc @atom-app-state [x y] (assoc-in (get @atom-app-state [x y]) [:flagged] false))))
+(defn unflag! [[x y]]
+  (swap! app-state assoc-in [[x y] :flagged] false))
 
-(defn step! [[x y]]
-  (when (not= (:flagged (get @atom-app-state [x y])) true)
-       (reset! atom-app-state (flood @atom-app-state [x y]))))
-
-(defn rect-cell [app-state pos condition]
+(defn rect-cell [[x y]]
   [:rect
-   {:width 1.85
-    :height 1.85
-    :x -0.9
-    :y -0.9
-    :stroke-width (if (= pos @mouse-over-cell)
-                    0.1 0.08)
+   {:width 1.85 :height 1.85
+    :x -0.9 :y -0.9
+    :stroke-width (if (= [x y] @mouse-over-cell) 0.1 0.08)
     :stroke "black"
     :fill (cond
-            (:exposed condition) "white"
-            (= pos @mouse-over-cell) "darkgrey"
+            (:exposed (get @app-state [x y])) "white"
+            (= [x y] @mouse-over-cell) "darkgrey"
             :else "silver")
     :on-mouse-over
-    (fn mouse-over-square [e]
-      (reset! mouse-over-cell pos))
+    #(reset! mouse-over-cell [x y])
     :on-click
-       #(case (game-status app-state)
+    #(when (not (:flagged (get @app-state [x y])))
+       (case (game-status)
          :new
-         (reset! atom-app-state (flood (assoc app-state pos {:mined false :exposed false}) pos))
+         (do
+           (swap! app-state assoc [x y] {:mined false :exposed false})
+           (swap! app-state step [x y]))
          :in-progress
-         (step! pos))
+         (swap! app-state step [x y])))
     :on-contextMenu
-    (fn [e]
-      (do (.preventDefault e)
-        (cond 
-          (:exposed condition) (run! step! (adjacents app-state pos))
-          (:flagged condition) (unflag pos)
-          :else (flag pos))))}])
+    #(do (.preventDefault %)
+         (if (:flagged (get @app-state [x y]))
+           (unflag! [x y])
+           (flag! [x y])))}])
 
-(defn text-cell [[x y]]
-  (let [mines (mine-detector @atom-app-state [x y])]
-    [:text
-     {:y 0.5
-      :text-anchor "middle"
-      :font-weight "900"
-      :fill (case mines
-              1 "blue"
-              2 "green"
-              3 "red"
-              4 "purple"
-              5 "brown"
-              "black")
-      :font-size "1.25"
-      :on-contextMenu
-      #(do (.preventDefault %)
-           (run! step! (adjacents @atom-app-state [x y])))}
-     mines]))
+(defn step! [[x y]]
+  (when (not (:flagged (get @app-state [x y])))
+    (reset! app-state (step @app-state [x y]))))
+
+(defn mine-num [[x y]]
+  [:text
+   {:y 0.5
+    :text-anchor "middle"
+    :font-weight "900"
+    :fill (case (mine-detector [x y])
+            1 "blue"
+            2 "green"
+            3 "red"
+            4 "purple"
+            5 "brown"
+            "black")
+    :font-size "1.25"
+    :on-contextMenu
+    #(do (.preventDefault %)
+         (run! step! (neighbors [x y])))}
+   (mine-detector [x y])])
 
 (defn bomb []
   [:text
@@ -133,46 +116,39 @@
     :font-size "1.25"}
    "💥"])
 
-(defn flagged [pos]
+(defn flag [[x y]]
   [:text
-   {:y 0.5
-    :text-anchor "middle"
-    :font-size "1.5"
+   {:y 0.5 :text-anchor "middle" :font-weight "900" :font-size "1.75"
     :on-contextMenu
-    (fn [e]
-      (let [condition (get @atom-app-state pos)]
-        (do (.preventDefault e)
-          (if (:flagged condition)
-            (unflag pos)))))}
+    #(do (.preventDefault %)
+         (if (:flagged (get @app-state [x y])) (unflag! [x y])))}
    "☠️"])
 
-(defn render-board [app-state]
+(defn render-board []
   (into
    [:svg.board
     {:view-box (str "0 0 " board-width " " board-height)
      :shape-rendering "auto"
      :style {:max-height "500px"}}]
-   (for [[[i j] condition] app-state]
-     [:g {:transform (str "translate(" i  "," j ") "
+   (for [[[x y] attrs] @app-state]
+     [:g {:transform (str "translate(" x  "," y ") "
                           "scale (0.5)"
                           "translate(1,1)")}
-      [rect-cell app-state [i j] condition]
-      (if (:flagged condition) [flagged [i j]])
-      (when (:exposed condition)
-        (if (:mined condition) [bomb]
-          (let [detected (mine-detector app-state [i j])]
-            (if (< 0 detected)
-              [text-cell [i j]]))))])))
+      [rect-cell [x y]]
+      (if (:flagged attrs) [flag [x y]])
+      (when (:exposed attrs)
+        (if (:mined attrs)
+          [bomb]
+          (if (< 0 (mine-detector [x y]))
+            [mine-num [x y]])))])))
 
 (defn minesweeper []
   [:center
-   [:button
-    {:on-click
-     (fn new-game-click [e]
-       (reset! atom-app-state (init-matrix)))}
-    "Reset"]
-   [:h1 (str (message @atom-app-state))]
-   [:div [render-board @atom-app-state]]])
+   [:h1
+    {:style {:font-size "50px"}
+     :on-click #(reset! app-state (into {} (map vector (rand-positions) (set-mines))))}
+    (icon)]
+   [render-board]])
 
 (defn mount-app-element []
   (when-let [el (gdom/getElement "app")]
