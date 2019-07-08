@@ -34,7 +34,8 @@
   (if (:mined (get app-state pos)) 1 0))
 
 (defn mine-detector [app-state pos]
-  (reduce + (map (partial mine-count app-state) (adjacents app-state pos))))
+  (reduce + (map (partial mine-count app-state)
+                 (adjacents app-state pos))))
 
 (defn flood [app-state pos]
   (let [cell (get app-state pos)]
@@ -71,6 +72,10 @@
 (defn unflag [[x y]]
   (reset! atom-app-state (assoc @atom-app-state [x y] (assoc-in (get @atom-app-state [x y]) [:flagged] false))))
 
+(defn step! [[x y]]
+  (when (not= (:flagged (get @atom-app-state [x y])) true)
+       (reset! atom-app-state (flood @atom-app-state [x y]))))
+
 (defn rect-cell [app-state pos condition]
   [:rect
    {:width 1.85
@@ -88,34 +93,37 @@
     (fn mouse-over-square [e]
       (reset! mouse-over-cell pos))
     :on-click
-    #(when (not= (:flagged condition) true)
-       (case (game-status app-state)
+       #(case (game-status app-state)
          :new
          (reset! atom-app-state (flood (assoc app-state pos {:mined false :exposed false}) pos))
-
          :in-progress
-         (reset! atom-app-state (flood app-state pos))))
+         (step! pos))
     :on-contextMenu
     (fn [e]
       (do (.preventDefault e)
-        (if (:flagged condition)
-          (unflag pos)
-          (flag pos))))}])
+        (cond 
+          (:exposed condition) (run! step! (adjacents app-state pos))
+          (:flagged condition) (unflag pos)
+          :else (flag pos))))}])
 
-(defn text-cell [detected-text]
-  [:text
-   {:y 0.5
-    :text-anchor "middle"
-    :font-weight "900"
-    :fill (case detected-text
-            "1" "blue"
-            "2" "green"
-            "3" "red"
-            "4" "purple"
-            "5" "brown"
-            "black")
-    :font-size "1.25"}
-   detected-text])
+(defn text-cell [[x y]]
+  (let [mines (mine-detector @atom-app-state [x y])]
+    [:text
+     {:y 0.5
+      :text-anchor "middle"
+      :font-weight "900"
+      :fill (case mines
+              1 "blue"
+              2 "green"
+              3 "red"
+              4 "purple"
+              5 "brown"
+              "black")
+      :font-size "1.25"
+      :on-contextMenu
+      #(do (.preventDefault %)
+           (run! step! (adjacents @atom-app-state [x y])))}
+     mines]))
 
 (defn bomb []
   [:text
@@ -154,16 +162,16 @@
         (if (:mined condition) [bomb]
           (let [detected (mine-detector app-state [i j])]
             (if (< 0 detected)
-              [text-cell (str detected)]))))])))
+              [text-cell [i j]]))))])))
 
 (defn minesweeper []
   [:center
-   [:h1 (message @atom-app-state)]
    [:button
     {:on-click
      (fn new-game-click [e]
        (reset! atom-app-state (init-matrix)))}
     "Reset"]
+   [:h1 (str (message @atom-app-state))]
    [:div [render-board @atom-app-state]]])
 
 (defn mount-app-element []
