@@ -22,7 +22,7 @@
   (atom (into {} (map vector (rand-positions) (set-mines)))))
 
 (defn neighbors [[x y]]
-  (filter (partial contains? @app-state) ; remove invalid squares
+  (filter (partial contains? @app-state)
           (for [dx [-1 0 1] dy [-1 0 1] :when (or dx dy)]
             [(+ x dx) (+ y dy)])))
 
@@ -96,6 +96,7 @@
          (swap! app-state step [x y])))
     :on-contextMenu
     #(do (.preventDefault %)
+         (reset! mouse-down? false)
          (cond
            (:exposed (get @app-state [x y]))
            (run! step! (neighbors [x y]))
@@ -110,19 +111,15 @@
     :text-anchor "middle"
     :font-weight "900"
     :fill (case (mine-detector [x y])
-            1 "blue"
-            2 "green"
-            3 "red"
-            4 "purple"
-            5 "brown"
-            "black")
+            1 "blue" 2 "green" 3 "red" 4 "purple" 5 "brown" "black")
     :font-size "1.25"
     :on-mouse-down
-    #(reset! mouse-down? true)
-    :on-mouse-up
-    #(reset! mouse-down? false)
+    #(do (reset! mouse-down? true)
+         (js/setTimeout (fn [] (reset! mouse-down? false)) 1000))
     :on-contextMenu
     #(do (.preventDefault %)
+         (reset! mouse-down? true)
+         (js/setTimeout (fn [] (reset! mouse-down? false)) 1000)
          (run! step! (neighbors [x y])))}
    (mine-detector [x y])])
 
@@ -138,6 +135,7 @@
    {:y 0.5 :text-anchor "middle" :font-weight "600" :fill "red" :font-size "1.5"
     :on-contextMenu
     #(do (.preventDefault %)
+         (reset! mouse-down? false)
          (if (:flagged (get @app-state [x y])) (unflag! [x y])))}
    "☠️"])
 

@@ -362,6 +362,8 @@ return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMP
 return (function (p1__10473_SHARP_){
 p1__10473_SHARP_.preventDefault();
 
+cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,false);
+
 if(cljs.core.truth_(cljs.core.cst$kw$exposed.cljs$core$IFn$_invoke$arity$1(cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.deref(minesweeper_reagent.core.app_state),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null))))){
 return cljs.core.run_BANG_(minesweeper_reagent.core.step_BANG_,minesweeper_reagent.core.neighbors(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null)));
 } else {
@@ -420,7 +422,7 @@ minesweeper_reagent.core.mine_num = (function minesweeper_reagent$core$mine_num(
 var vec__10482 = p__10481;
 var x = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__10482,(0),null);
 var y = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__10482,(1),null);
-return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$text,new cljs.core.PersistentArrayMap(null, 8, [cljs.core.cst$kw$y,0.5,cljs.core.cst$kw$text_DASH_anchor,"middle",cljs.core.cst$kw$font_DASH_weight,"900",cljs.core.cst$kw$fill,(function (){var G__10485 = minesweeper_reagent.core.mine_detector(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null));
+return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$text,new cljs.core.PersistentArrayMap(null, 7, [cljs.core.cst$kw$y,0.5,cljs.core.cst$kw$text_DASH_anchor,"middle",cljs.core.cst$kw$font_DASH_weight,"900",cljs.core.cst$kw$fill,(function (){var G__10485 = minesweeper_reagent.core.mine_detector(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null));
 switch (G__10485) {
 case (1):
 return "blue";
@@ -448,15 +450,25 @@ return "black";
 }
 })(),cljs.core.cst$kw$font_DASH_size,"1.25",cljs.core.cst$kw$on_DASH_mouse_DASH_down,((function (vec__10482,x,y){
 return (function (){
-return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,true);
-});})(vec__10482,x,y))
-,cljs.core.cst$kw$on_DASH_mouse_DASH_up,((function (vec__10482,x,y){
+cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,true);
+
+return setTimeout(((function (vec__10482,x,y){
 return (function (){
 return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,false);
+});})(vec__10482,x,y))
+,(1000));
 });})(vec__10482,x,y))
 ,cljs.core.cst$kw$on_DASH_contextMenu,((function (vec__10482,x,y){
 return (function (p1__10480_SHARP_){
 p1__10480_SHARP_.preventDefault();
+
+cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,true);
+
+setTimeout(((function (vec__10482,x,y){
+return (function (){
+return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,false);
+});})(vec__10482,x,y))
+,(1000));
 
 return cljs.core.run_BANG_(minesweeper_reagent.core.step_BANG_,minesweeper_reagent.core.neighbors(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null)));
 });})(vec__10482,x,y))
@@ -472,6 +484,8 @@ var y = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__10489,(1),null);
 return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$text,new cljs.core.PersistentArrayMap(null, 6, [cljs.core.cst$kw$y,0.5,cljs.core.cst$kw$text_DASH_anchor,"middle",cljs.core.cst$kw$font_DASH_weight,"600",cljs.core.cst$kw$fill,"red",cljs.core.cst$kw$font_DASH_size,"1.5",cljs.core.cst$kw$on_DASH_contextMenu,((function (vec__10489,x,y){
 return (function (p1__10487_SHARP_){
 p1__10487_SHARP_.preventDefault();
+
+cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,false);
 
 if(cljs.core.truth_(cljs.core.cst$kw$flagged.cljs$core$IFn$_invoke$arity$1(cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.deref(minesweeper_reagent.core.app_state),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null))))){
 return minesweeper_reagent.core.unflag_BANG_(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null));
