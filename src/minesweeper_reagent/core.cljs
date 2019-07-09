@@ -47,8 +47,13 @@
     (some (fn [[_k v]] (:exposed v)) @app-state) :in-progress
     :else :new))
 
+(def mouse-down? (atom false))
+
 (defn icon []
-  (case (game-status) :dead "🤯" :win "🤓" "🥺"))
+  (case (game-status)
+    :dead "🤯"
+    :win "🤓"
+    (if @mouse-down? "😲" "🥺")))
 
 (def mouse-over-cell (atom nil))
 
@@ -73,6 +78,10 @@
             (:exposed (get @app-state [x y])) "white"
             (= [x y] @mouse-over-cell) "darkgrey"
             :else "silver")
+    :on-mouse-down
+    #(reset! mouse-down? true)
+    :on-mouse-up
+    #(reset! mouse-down? false)
     :on-mouse-over
     #(reset! mouse-over-cell [x y])
     :on-mouse-out
@@ -150,8 +159,8 @@
 
 (defn minesweeper []
   [:center
-   [:h1
-    {:style {:font-size "50px"}
+   [:div
+    {:style {:font-size "75px"}
      :on-click #(reset! app-state (into {} (map vector (rand-positions) (set-mines))))}
     (icon)]
    [render-board]])
