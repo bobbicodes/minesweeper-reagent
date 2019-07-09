@@ -94,7 +94,7 @@ if((function (){var i__10418 = (0);
 while(true){
 if((i__10418 < size__4323__auto__)){
 var i = cljs.core._nth.cljs$core$IFn$_invoke$arity$2(c__4322__auto__,i__10418);
-cljs.core.chunk_append(b__10419,new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$mined,(i < cljs.core.deref(minesweeper_reagent.core.num_mines)),cljs.core.cst$kw$exposed,false], null));
+cljs.core.chunk_append(b__10419,new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$mined,(i < cljs.core.deref(minesweeper_reagent.core.num_mines)),cljs.core.cst$kw$exposed,false,cljs.core.cst$kw$focused,false], null));
 
 var G__10420 = (i__10418 + (1));
 i__10418 = G__10420;
@@ -111,7 +111,7 @@ return cljs.core.chunk_cons(cljs.core.chunk(b__10419),null);
 }
 } else {
 var i = cljs.core.first(s__10417__$2);
-return cljs.core.cons(new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$mined,(i < cljs.core.deref(minesweeper_reagent.core.num_mines)),cljs.core.cst$kw$exposed,false], null),minesweeper_reagent$core$set_mines_$_iter__10416(cljs.core.rest(s__10417__$2)));
+return cljs.core.cons(new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$mined,(i < cljs.core.deref(minesweeper_reagent.core.num_mines)),cljs.core.cst$kw$exposed,false,cljs.core.cst$kw$focused,false], null),minesweeper_reagent$core$set_mines_$_iter__10416(cljs.core.rest(s__10417__$2)));
 }
 } else {
 return null;
@@ -136,10 +136,10 @@ while(true){
 var temp__5457__auto__ = cljs.core.seq(s__10426__$1);
 if(temp__5457__auto__){
 var xs__6012__auto__ = temp__5457__auto__;
-var i = cljs.core.first(xs__6012__auto__);
-var iterys__4320__auto__ = ((function (s__10426__$1,i,xs__6012__auto__,temp__5457__auto__,vec__10422,x,y){
+var dx = cljs.core.first(xs__6012__auto__);
+var iterys__4320__auto__ = ((function (s__10426__$1,dx,xs__6012__auto__,temp__5457__auto__,vec__10422,x,y){
 return (function minesweeper_reagent$core$neighbors_$_iter__10425_$_iter__10427(s__10428){
-return (new cljs.core.LazySeq(null,((function (s__10426__$1,i,xs__6012__auto__,temp__5457__auto__,vec__10422,x,y){
+return (new cljs.core.LazySeq(null,((function (s__10426__$1,dx,xs__6012__auto__,temp__5457__auto__,vec__10422,x,y){
 return (function (){
 var s__10428__$1 = s__10428;
 while(true){
@@ -153,15 +153,15 @@ var b__10430 = cljs.core.chunk_buffer(size__4323__auto__);
 if((function (){var i__10429 = (0);
 while(true){
 if((i__10429 < size__4323__auto__)){
-var j = cljs.core._nth.cljs$core$IFn$_invoke$arity$2(c__4322__auto__,i__10429);
-if(cljs.core.truth_((function (){var or__3949__auto__ = i;
+var dy = cljs.core._nth.cljs$core$IFn$_invoke$arity$2(c__4322__auto__,i__10429);
+if(cljs.core.truth_((function (){var or__3949__auto__ = dx;
 if(cljs.core.truth_(or__3949__auto__)){
 return or__3949__auto__;
 } else {
-return j;
+return dy;
 }
 })())){
-cljs.core.chunk_append(b__10430,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [(x + i),(y + j)], null));
+cljs.core.chunk_append(b__10430,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [(x + dx),(y + dy)], null));
 
 var G__10431 = (i__10429 + (1));
 i__10429 = G__10431;
@@ -182,15 +182,15 @@ return cljs.core.chunk_cons(cljs.core.chunk(b__10430),minesweeper_reagent$core$n
 return cljs.core.chunk_cons(cljs.core.chunk(b__10430),null);
 }
 } else {
-var j = cljs.core.first(s__10428__$2);
-if(cljs.core.truth_((function (){var or__3949__auto__ = i;
+var dy = cljs.core.first(s__10428__$2);
+if(cljs.core.truth_((function (){var or__3949__auto__ = dx;
 if(cljs.core.truth_(or__3949__auto__)){
 return or__3949__auto__;
 } else {
-return j;
+return dy;
 }
 })())){
-return cljs.core.cons(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [(x + i),(y + j)], null),minesweeper_reagent$core$neighbors_$_iter__10425_$_iter__10427(cljs.core.rest(s__10428__$2)));
+return cljs.core.cons(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [(x + dx),(y + dy)], null),minesweeper_reagent$core$neighbors_$_iter__10425_$_iter__10427(cljs.core.rest(s__10428__$2)));
 } else {
 var G__10433 = cljs.core.rest(s__10428__$2);
 s__10428__$1 = G__10433;
@@ -202,9 +202,9 @@ return null;
 }
 break;
 }
-});})(s__10426__$1,i,xs__6012__auto__,temp__5457__auto__,vec__10422,x,y))
+});})(s__10426__$1,dx,xs__6012__auto__,temp__5457__auto__,vec__10422,x,y))
 ,null,null));
-});})(s__10426__$1,i,xs__6012__auto__,temp__5457__auto__,vec__10422,x,y))
+});})(s__10426__$1,dx,xs__6012__auto__,temp__5457__auto__,vec__10422,x,y))
 ;
 var fs__4321__auto__ = cljs.core.seq(iterys__4320__auto__(new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [(-1),(0),(1)], null)));
 if(fs__4321__auto__){
@@ -328,7 +328,6 @@ return "\uD83E\uDD7A";
 
 }
 });
-minesweeper_reagent.core.mouse_over_cell = reagent.core.atom.cljs$core$IFn$_invoke$arity$1(null);
 minesweeper_reagent.core.flag_BANG_ = (function minesweeper_reagent$core$flag_BANG_(p__10461){
 var vec__10462 = p__10461;
 var x = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__10462,(0),null);
@@ -376,9 +375,9 @@ return minesweeper_reagent.core.flag_BANG_(new cljs.core.PersistentVector(null, 
 });})(vec__10475,x,y))
 ,((function (vec__10475,x,y){
 return (function (){
-return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_over_cell,null);
+return cljs.core.swap_BANG_.cljs$core$IFn$_invoke$arity$4(minesweeper_reagent.core.app_state,cljs.core.assoc_in,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null),cljs.core.cst$kw$focused], null),false);
 });})(vec__10475,x,y))
-,(cljs.core.truth_(cljs.core.cst$kw$exposed.cljs$core$IFn$_invoke$arity$1(cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.deref(minesweeper_reagent.core.app_state),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null))))?"white":((cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null),cljs.core.deref(minesweeper_reagent.core.mouse_over_cell)))?"darkgrey":"silver"
+,(cljs.core.truth_(cljs.core.cst$kw$exposed.cljs$core$IFn$_invoke$arity$1(cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.deref(minesweeper_reagent.core.app_state),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null))))?"white":(cljs.core.truth_(cljs.core.cst$kw$focused.cljs$core$IFn$_invoke$arity$1(cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.deref(minesweeper_reagent.core.app_state),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null))))?"darkgrey":"silver"
 )),1.85,((function (vec__10475,x,y){
 return (function (){
 return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,true);
@@ -407,13 +406,13 @@ throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$ari
 return null;
 }
 });})(vec__10475,x,y))
-,((cljs.core._EQ_.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null),cljs.core.deref(minesweeper_reagent.core.mouse_over_cell)))?0.1:0.08),((function (vec__10475,x,y){
+,(cljs.core.truth_(cljs.core.cst$kw$focused.cljs$core$IFn$_invoke$arity$1(cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.deref(minesweeper_reagent.core.app_state),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null))))?0.1:0.08),((function (vec__10475,x,y){
 return (function (){
 return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,false);
 });})(vec__10475,x,y))
 ,((function (vec__10475,x,y){
 return (function (){
-return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_over_cell,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null));
+return cljs.core.swap_BANG_.cljs$core$IFn$_invoke$arity$4(minesweeper_reagent.core.app_state,cljs.core.assoc_in,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null),cljs.core.cst$kw$focused], null),true);
 });})(vec__10475,x,y))
 ,-0.9,1.85])], null);
 });
@@ -556,7 +555,7 @@ return cljs.core.reset_BANG_(minesweeper_reagent.core.app_state,cljs.core.into.c
 minesweeper_reagent.core.minesweeper = (function minesweeper_reagent$core$minesweeper(){
 return new cljs.core.PersistentVector(null, 6, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$center,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$h1,"Minesweeper"], null),new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$div,"Size: ",new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [minesweeper_reagent.core.size_input], null)," Mines: ",new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [minesweeper_reagent.core.mines_input], null)], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$p], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$div,new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$style,new cljs.core.PersistentArrayMap(null, 1, [cljs.core.cst$kw$font_DASH_size,"75px"], null),cljs.core.cst$kw$on_DASH_click,(function (){
 return cljs.core.reset_BANG_(minesweeper_reagent.core.app_state,cljs.core.into.cljs$core$IFn$_invoke$arity$2(cljs.core.PersistentArrayMap.EMPTY,cljs.core.map.cljs$core$IFn$_invoke$arity$3(cljs.core.vector,minesweeper_reagent.core.rand_positions(),minesweeper_reagent.core.set_mines())));
-})], null),minesweeper_reagent.core.icon()], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [minesweeper_reagent.core.render_board], null)], null);
+})], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [minesweeper_reagent.core.icon], null)], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [minesweeper_reagent.core.render_board], null)], null);
 });
 minesweeper_reagent.core.mount_app_element = (function minesweeper_reagent$core$mount_app_element(){
 var temp__5457__auto__ = goog.dom.getElement("app");

@@ -15,15 +15,16 @@
 (defn set-mines []
   (for [i (range (* @grid-size @grid-size))]
     {:mined (< i @num-mines)
-     :exposed false}))
+     :exposed false
+     :focused false}))
 
 (def app-state
   (atom (into {} (map vector (rand-positions) (set-mines)))))
 
 (defn neighbors [[x y]]
   (filter (partial contains? @app-state) ; remove invalid squares
-          (for [i [-1 0 1] j [-1 0 1] :when (or i j)]
-            [(+ x i) (+ y j)])))
+          (for [dx [-1 0 1] dy [-1 0 1] :when (or dx dy)]
+            [(+ x dx) (+ y dy)])))
 
 (defn mine-count [[x y]]
   (if (:mined (get @app-state [x y])) 1 0))
@@ -55,8 +56,6 @@
     :win "🤓"
     (if @mouse-down? "😬" "🥺")))
 
-(def mouse-over-cell (atom nil))
-
 (defn flag! [[x y]]
   (when (not (:exposed (get @app-state [x y])))
   (swap! app-state assoc-in [[x y] :flagged] true)))
@@ -72,20 +71,20 @@
   [:rect
    {:width 1.85 :height 1.85
     :x -0.9 :y -0.9
-    :stroke-width (if (= [x y] @mouse-over-cell) 0.1 0.08)
+    :stroke-width (if (:focused (get @app-state [x y])) 0.1 0.08)
     :stroke "black"
     :fill (cond
             (:exposed (get @app-state [x y])) "white"
-            (= [x y] @mouse-over-cell) "darkgrey"
+            (:focused (get @app-state [x y])) "darkgrey"
             :else "silver")
     :on-mouse-down
     #(reset! mouse-down? true)
     :on-mouse-up
     #(reset! mouse-down? false)
     :on-mouse-over
-    #(reset! mouse-over-cell [x y])
+    #(swap! app-state assoc-in [[x y] :focused] true)
     :on-mouse-out
-    #(reset! mouse-over-cell nil)
+    #(swap! app-state assoc-in [[x y] :focused] false)
     :on-click
     #(when (not (:flagged (get @app-state [x y])))
        (case (game-status)
@@ -188,7 +187,7 @@
    [:div
     {:style {:font-size "75px"}
      :on-click #(reset! app-state (into {} (map vector (rand-positions) (set-mines))))}
-    (icon)]
+    [icon]]
    [render-board]])
 
 (defn mount-app-element []

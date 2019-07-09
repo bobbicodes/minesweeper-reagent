@@ -150,6 +150,7 @@ cljs.core.cst$sym$fn_STAR_ = new cljs.core.Symbol(null,"fn*","fn*",-752876845,nu
 cljs.core.cst$sym$val = new cljs.core.Symbol(null,"val","val",1769233139,null);
 cljs.core.cst$kw$on_DASH_write = new cljs.core.Keyword(null,"on-write","on-write",31519475);
 cljs.core.cst$sym$ascending_QMARK_ = new cljs.core.Symbol(null,"ascending?","ascending?",-1938452653,null);
+cljs.core.cst$kw$focused = new cljs.core.Keyword(null,"focused","focused",1851572115);
 cljs.core.cst$sym$recur = new cljs.core.Symbol(null,"recur","recur",1202958259,null);
 cljs.core.cst$sym$xf = new cljs.core.Symbol(null,"xf","xf",2042434515,null);
 cljs.core.cst$sym$ci = new cljs.core.Symbol(null,"ci","ci",2049808339,null);
