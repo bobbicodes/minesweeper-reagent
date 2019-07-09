@@ -75,6 +75,8 @@
             :else "silver")
     :on-mouse-over
     #(reset! mouse-over-cell [x y])
+    :on-mouse-out
+    #(reset! mouse-over-cell nil)
     :on-click
     #(when (not (:flagged (get @app-state [x y])))
        (case (game-status)
