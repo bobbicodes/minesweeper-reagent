@@ -3,18 +3,18 @@
    [goog.dom :as gdom]
    [reagent.core :as reagent :refer [atom]]))
 
-(def board-width 12)
-(def board-height 12)
-(def num-mines 18)
+(def grid-size (atom 12))
+
+(def num-mines (atom 18))
 
 (defn rand-positions []
   (shuffle
-   (for [i (range board-width) j (range board-height)]
+   (for [i (range @grid-size) j (range @grid-size)]
      [i j])))
 
 (defn set-mines []
-  (for [i (range (* board-height board-width))]
-    {:mined (< i num-mines)
+  (for [i (range (* @grid-size @grid-size))]
+    {:mined (< i @num-mines)
      :exposed false}))
 
 (def app-state
@@ -146,9 +146,9 @@
 (defn render-board []
   (into
    [:svg.board
-    {:view-box (str "0 0 " board-width " " board-height)
+    {:view-box (str "0 0 " @grid-size " " @grid-size)
      :shape-rendering "auto"
-     :style {:max-height "500px"}}]
+     :style {:max-height "800px"}}]
    (for [[[x y] attrs] @app-state]
      [:g {:transform (str "translate(" x  "," y ") "
                           "scale (0.5)"
@@ -161,8 +161,28 @@
           (if (< 0 (mine-detector [x y]))
             [mine-num [x y]])))])))
 
+(defn size-input []
+  (fn []
+    [:div
+     [:p "Grid size: "
+      [:input {:type "number"
+               :value @grid-size
+               :on-change #(reset! grid-size (-> % .-target .-value))}]]]))
+
+(defn mines-input []
+  (fn []
+    [:div
+     [:p "Mine count: "
+      [:input {:type "number"
+               :value @num-mines
+               :on-change #(reset! num-mines (-> % .-target .-value))}]]]))
+
 (defn minesweeper []
   [:center
+   [:h1 "Minesweeper"]
+   [size-input]
+   [mines-input]
+   [:p ]
    [:div
     {:style {:font-size "75px"}
      :on-click #(reset! app-state (into {} (map vector (rand-positions) (set-mines))))}
