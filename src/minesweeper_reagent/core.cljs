@@ -127,13 +127,13 @@
   [:text
    {:y 0.5
     :text-anchor "middle"
-    :font-weight "900"
-    :font-size "1.25"}
+;    :font-weight "900"
+    :font-size "1.5"}
    "💥"])
 
 (defn flag [[x y]]
   [:text
-   {:y 0.5 :text-anchor "middle" :font-weight "900" :font-size "1.75"
+   {:y 0.5 :text-anchor "middle" :font-weight "600" :fill "red" :font-size "1.5"
     :on-contextMenu
     #(do (.preventDefault %)
          (if (:flagged (get @app-state [x y])) (unflag! [x y])))}

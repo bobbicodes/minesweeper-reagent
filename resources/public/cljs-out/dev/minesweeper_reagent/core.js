@@ -457,13 +457,13 @@ return cljs.core.run_BANG_(minesweeper_reagent.core.step_BANG_,minesweeper_reage
 ], null),minesweeper_reagent.core.mine_detector(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null))], null);
 });
 minesweeper_reagent.core.bomb = (function minesweeper_reagent$core$bomb(){
-return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$text,new cljs.core.PersistentArrayMap(null, 4, [cljs.core.cst$kw$y,0.5,cljs.core.cst$kw$text_DASH_anchor,"middle",cljs.core.cst$kw$font_DASH_weight,"900",cljs.core.cst$kw$font_DASH_size,"1.25"], null),"\uD83D\uDCA5"], null);
+return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$text,new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$y,0.5,cljs.core.cst$kw$text_DASH_anchor,"middle",cljs.core.cst$kw$font_DASH_size,"1.5"], null),"\uD83D\uDCA5"], null);
 });
 minesweeper_reagent.core.flag = (function minesweeper_reagent$core$flag(p__10488){
 var vec__10489 = p__10488;
 var x = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__10489,(0),null);
 var y = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__10489,(1),null);
-return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$text,new cljs.core.PersistentArrayMap(null, 5, [cljs.core.cst$kw$y,0.5,cljs.core.cst$kw$text_DASH_anchor,"middle",cljs.core.cst$kw$font_DASH_weight,"900",cljs.core.cst$kw$font_DASH_size,"1.75",cljs.core.cst$kw$on_DASH_contextMenu,((function (vec__10489,x,y){
+return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$text,new cljs.core.PersistentArrayMap(null, 6, [cljs.core.cst$kw$y,0.5,cljs.core.cst$kw$text_DASH_anchor,"middle",cljs.core.cst$kw$font_DASH_weight,"600",cljs.core.cst$kw$fill,"red",cljs.core.cst$kw$font_DASH_size,"1.5",cljs.core.cst$kw$on_DASH_contextMenu,((function (vec__10489,x,y){
 return (function (p1__10487_SHARP_){
 p1__10487_SHARP_.preventDefault();
 
