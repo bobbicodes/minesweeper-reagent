@@ -15,8 +15,7 @@
 (defn set-mines []
   (for [i (range (* @grid-size @grid-size))]
     {:mined (< i @num-mines)
-     :exposed false
-     :focused false}))
+     :exposed false}))
 
 (def app-state
   (atom (into {} (map vector (rand-positions) (set-mines)))))
@@ -68,42 +67,44 @@
     (reset! app-state (step @app-state [x y]))))
 
 (defn rect-cell [[x y]]
-  [:rect
-   {:width 1.85 :height 1.85
-    :x -0.9 :y -0.9
-    :stroke-width (if (:focused (get @app-state [x y])) 0.1 0.08)
-    :stroke "black"
-    :fill (cond
-            (:exposed (get @app-state [x y])) "white"
-            (:focused (get @app-state [x y])) "darkgrey"
-            :else "silver")
-    :on-mouse-down
-    #(reset! mouse-down? true)
-    :on-mouse-up
-    #(reset! mouse-down? false)
-    :on-mouse-over
-    #(swap! app-state assoc-in [[x y] :focused] true)
-    :on-mouse-out
-    #(swap! app-state assoc-in [[x y] :focused] false)
-    :on-click
-    #(when (not (:flagged (get @app-state [x y])))
-       (case (game-status)
-         :new
-         (do
-           (swap! app-state assoc [x y] {:mined false :exposed false})
-           (swap! app-state step [x y]))
-         :in-progress
-         (swap! app-state step [x y])))
-    :on-contextMenu
-    #(do (.preventDefault %)
-         (reset! mouse-down? false)
-         (cond
-           (:exposed (get @app-state [x y]))
-           (run! step! (neighbors [x y]))
-           (:flagged (get @app-state [x y]))
-           (unflag! [x y])
-           :else
-           (flag! [x y])))}])
+  (let [focused (atom false)]
+    (fn render-square []
+      [:rect
+       {:width 1.85 :height 1.85
+        :x -0.9 :y -0.9
+        :stroke-width (if @focused 0.1 0.08)
+        :stroke "black"
+        :fill (cond
+                (:exposed (get @app-state [x y])) "white"
+                @focused "darkgrey"
+                :else "silver")
+        :on-mouse-down
+        #(reset! mouse-down? true)
+        :on-mouse-up
+        #(reset! mouse-down? false)
+        :on-mouse-over
+        #(reset! focused true) 
+        :on-mouse-out
+        #(reset! focused false)
+        :on-click
+        #(when (not (:flagged (get @app-state [x y])))
+           (case (game-status)
+             :new
+             (do
+               (swap! app-state assoc [x y] {:mined false :exposed false})
+               (swap! app-state step [x y]))
+             :in-progress
+             (swap! app-state step [x y])))
+        :on-contextMenu
+        #(do (.preventDefault %)
+             (reset! mouse-down? false)
+             (cond
+               (:exposed (get @app-state [x y]))
+               (run! step! (neighbors [x y]))
+               (:flagged (get @app-state [x y]))
+               (unflag! [x y])
+               :else
+               (flag! [x y])))}])))
 
 (defn mine-num [[x y]]
   [:text
@@ -115,11 +116,11 @@
     :font-size "1.25"
     :on-mouse-down
     #(do (reset! mouse-down? true)
-         (js/setTimeout (fn [] (reset! mouse-down? false)) 1000))
+         (js/setTimeout (fn [] (reset! mouse-down? false)) 800))
     :on-contextMenu
     #(do (.preventDefault %)
          (reset! mouse-down? true)
-         (js/setTimeout (fn [] (reset! mouse-down? false)) 1000)
+         (js/setTimeout (fn [] (reset! mouse-down? false)) 800)
          (run! step! (neighbors [x y])))}
    (mine-detector [x y])])
 
@@ -131,13 +132,13 @@
    "💥"])
 
 (defn flag [[x y]]
-  [:text
-   {:y 0.5 :text-anchor "middle" :font-weight "600" :fill "red" :font-size "1.5"
-    :on-contextMenu
-    #(do (.preventDefault %)
-         (reset! mouse-down? false)
-         (if (:flagged (get @app-state [x y])) (unflag! [x y])))}
-   "☠️"])
+      [:text
+       {:y 0.5 :text-anchor "middle" :font-weight "600" :fill "red" :font-size "1.5"
+        :on-contextMenu
+        #(do (.preventDefault %)
+             (reset! mouse-down? false)
+             (if (:flagged (get @app-state [x y])) (unflag! [x y])))}
+       "☠️" ])
 
 (defn render-board []
   (into

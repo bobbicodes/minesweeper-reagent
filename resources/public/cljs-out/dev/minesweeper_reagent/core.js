@@ -94,7 +94,7 @@ if((function (){var i__10418 = (0);
 while(true){
 if((i__10418 < size__4323__auto__)){
 var i = cljs.core._nth.cljs$core$IFn$_invoke$arity$2(c__4322__auto__,i__10418);
-cljs.core.chunk_append(b__10419,new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$mined,(i < cljs.core.deref(minesweeper_reagent.core.num_mines)),cljs.core.cst$kw$exposed,false,cljs.core.cst$kw$focused,false], null));
+cljs.core.chunk_append(b__10419,new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$mined,(i < cljs.core.deref(minesweeper_reagent.core.num_mines)),cljs.core.cst$kw$exposed,false], null));
 
 var G__10420 = (i__10418 + (1));
 i__10418 = G__10420;
@@ -111,7 +111,7 @@ return cljs.core.chunk_cons(cljs.core.chunk(b__10419),null);
 }
 } else {
 var i = cljs.core.first(s__10417__$2);
-return cljs.core.cons(new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$mined,(i < cljs.core.deref(minesweeper_reagent.core.num_mines)),cljs.core.cst$kw$exposed,false,cljs.core.cst$kw$focused,false], null),minesweeper_reagent$core$set_mines_$_iter__10416(cljs.core.rest(s__10417__$2)));
+return cljs.core.cons(new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$mined,(i < cljs.core.deref(minesweeper_reagent.core.num_mines)),cljs.core.cst$kw$exposed,false], null),minesweeper_reagent$core$set_mines_$_iter__10416(cljs.core.rest(s__10417__$2)));
 }
 } else {
 return null;
@@ -358,7 +358,10 @@ minesweeper_reagent.core.rect_cell = (function minesweeper_reagent$core$rect_cel
 var vec__10475 = p__10474;
 var x = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__10475,(0),null);
 var y = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__10475,(1),null);
-return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$rect,cljs.core.PersistentHashMap.fromArrays([cljs.core.cst$kw$y,cljs.core.cst$kw$stroke,cljs.core.cst$kw$on_DASH_contextMenu,cljs.core.cst$kw$on_DASH_mouse_DASH_out,cljs.core.cst$kw$fill,cljs.core.cst$kw$width,cljs.core.cst$kw$on_DASH_mouse_DASH_down,cljs.core.cst$kw$on_DASH_click,cljs.core.cst$kw$stroke_DASH_width,cljs.core.cst$kw$on_DASH_mouse_DASH_up,cljs.core.cst$kw$on_DASH_mouse_DASH_over,cljs.core.cst$kw$x,cljs.core.cst$kw$height],[-0.9,"black",((function (vec__10475,x,y){
+var focused = reagent.core.atom.cljs$core$IFn$_invoke$arity$1(false);
+return ((function (focused,vec__10475,x,y){
+return (function minesweeper_reagent$core$rect_cell_$_render_square(){
+return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$rect,cljs.core.PersistentHashMap.fromArrays([cljs.core.cst$kw$y,cljs.core.cst$kw$stroke,cljs.core.cst$kw$on_DASH_contextMenu,cljs.core.cst$kw$on_DASH_mouse_DASH_out,cljs.core.cst$kw$fill,cljs.core.cst$kw$width,cljs.core.cst$kw$on_DASH_mouse_DASH_down,cljs.core.cst$kw$on_DASH_click,cljs.core.cst$kw$stroke_DASH_width,cljs.core.cst$kw$on_DASH_mouse_DASH_up,cljs.core.cst$kw$on_DASH_mouse_DASH_over,cljs.core.cst$kw$x,cljs.core.cst$kw$height],[-0.9,"black",((function (focused,vec__10475,x,y){
 return (function (p1__10473_SHARP_){
 p1__10473_SHARP_.preventDefault();
 
@@ -374,17 +377,17 @@ return minesweeper_reagent.core.flag_BANG_(new cljs.core.PersistentVector(null, 
 
 }
 }
-});})(vec__10475,x,y))
-,((function (vec__10475,x,y){
+});})(focused,vec__10475,x,y))
+,((function (focused,vec__10475,x,y){
 return (function (){
-return cljs.core.swap_BANG_.cljs$core$IFn$_invoke$arity$4(minesweeper_reagent.core.app_state,cljs.core.assoc_in,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null),cljs.core.cst$kw$focused], null),false);
-});})(vec__10475,x,y))
-,(cljs.core.truth_(cljs.core.cst$kw$exposed.cljs$core$IFn$_invoke$arity$1(cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.deref(minesweeper_reagent.core.app_state),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null))))?"white":(cljs.core.truth_(cljs.core.cst$kw$focused.cljs$core$IFn$_invoke$arity$1(cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.deref(minesweeper_reagent.core.app_state),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null))))?"darkgrey":"silver"
-)),1.85,((function (vec__10475,x,y){
+return cljs.core.reset_BANG_(focused,false);
+});})(focused,vec__10475,x,y))
+,(cljs.core.truth_(cljs.core.cst$kw$exposed.cljs$core$IFn$_invoke$arity$1(cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.deref(minesweeper_reagent.core.app_state),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null))))?"white":(cljs.core.truth_(cljs.core.deref(focused))?"darkgrey":"silver"
+)),1.85,((function (focused,vec__10475,x,y){
 return (function (){
 return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,true);
-});})(vec__10475,x,y))
-,((function (vec__10475,x,y){
+});})(focused,vec__10475,x,y))
+,((function (focused,vec__10475,x,y){
 return (function (){
 if(cljs.core.not(cljs.core.cst$kw$flagged.cljs$core$IFn$_invoke$arity$1(cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.deref(minesweeper_reagent.core.app_state),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null))))){
 var G__10478 = minesweeper_reagent.core.game_status();
@@ -407,16 +410,18 @@ throw (new Error(["No matching clause: ",cljs.core.str.cljs$core$IFn$_invoke$ari
 } else {
 return null;
 }
-});})(vec__10475,x,y))
-,(cljs.core.truth_(cljs.core.cst$kw$focused.cljs$core$IFn$_invoke$arity$1(cljs.core.get.cljs$core$IFn$_invoke$arity$2(cljs.core.deref(minesweeper_reagent.core.app_state),new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null))))?0.1:0.08),((function (vec__10475,x,y){
+});})(focused,vec__10475,x,y))
+,(cljs.core.truth_(cljs.core.deref(focused))?0.1:0.08),((function (focused,vec__10475,x,y){
 return (function (){
 return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,false);
-});})(vec__10475,x,y))
-,((function (vec__10475,x,y){
+});})(focused,vec__10475,x,y))
+,((function (focused,vec__10475,x,y){
 return (function (){
-return cljs.core.swap_BANG_.cljs$core$IFn$_invoke$arity$4(minesweeper_reagent.core.app_state,cljs.core.assoc_in,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null),cljs.core.cst$kw$focused], null),true);
-});})(vec__10475,x,y))
+return cljs.core.reset_BANG_(focused,true);
+});})(focused,vec__10475,x,y))
 ,-0.9,1.85])], null);
+});
+;})(focused,vec__10475,x,y))
 });
 minesweeper_reagent.core.mine_num = (function minesweeper_reagent$core$mine_num(p__10481){
 var vec__10482 = p__10481;
@@ -456,7 +461,7 @@ return setTimeout(((function (vec__10482,x,y){
 return (function (){
 return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,false);
 });})(vec__10482,x,y))
-,(1000));
+,(800));
 });})(vec__10482,x,y))
 ,cljs.core.cst$kw$on_DASH_contextMenu,((function (vec__10482,x,y){
 return (function (p1__10480_SHARP_){
@@ -468,7 +473,7 @@ setTimeout(((function (vec__10482,x,y){
 return (function (){
 return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,false);
 });})(vec__10482,x,y))
-,(1000));
+,(800));
 
 return cljs.core.run_BANG_(minesweeper_reagent.core.step_BANG_,minesweeper_reagent.core.neighbors(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null)));
 });})(vec__10482,x,y))
