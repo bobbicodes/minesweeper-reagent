@@ -483,7 +483,7 @@ return null;
 ], null),"\u2620\uFE0F"], null);
 });
 minesweeper_reagent.core.render_board = (function minesweeper_reagent$core$render_board(){
-return cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$svg$board,new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$view_DASH_box,["0 0 ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(cljs.core.deref(minesweeper_reagent.core.grid_size))," ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(cljs.core.deref(minesweeper_reagent.core.grid_size))].join(''),cljs.core.cst$kw$shape_DASH_rendering,"auto",cljs.core.cst$kw$style,new cljs.core.PersistentArrayMap(null, 1, [cljs.core.cst$kw$max_DASH_height,"800px"], null)], null)], null),(function (){var iter__4324__auto__ = (function minesweeper_reagent$core$render_board_$_iter__10492(s__10493){
+return cljs.core.into.cljs$core$IFn$_invoke$arity$2(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$svg$board,new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$view_DASH_box,["0 0 ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(cljs.core.deref(minesweeper_reagent.core.grid_size))," ",cljs.core.str.cljs$core$IFn$_invoke$arity$1(cljs.core.deref(minesweeper_reagent.core.grid_size))].join(''),cljs.core.cst$kw$shape_DASH_rendering,"auto",cljs.core.cst$kw$style,new cljs.core.PersistentArrayMap(null, 1, [cljs.core.cst$kw$max_DASH_height,"500px"], null)], null)], null),(function (){var iter__4324__auto__ = (function minesweeper_reagent$core$render_board_$_iter__10492(s__10493){
 return (new cljs.core.LazySeq(null,(function (){
 var s__10493__$1 = s__10493;
 while(true){
@@ -537,20 +537,24 @@ return iter__4324__auto__(cljs.core.deref(minesweeper_reagent.core.app_state));
 });
 minesweeper_reagent.core.size_input = (function minesweeper_reagent$core$size_input(){
 return (function (){
-return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$div,new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$p,"Grid size: ",new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$input,new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$type,"number",cljs.core.cst$kw$value,cljs.core.deref(minesweeper_reagent.core.grid_size),cljs.core.cst$kw$on_DASH_change,(function (p1__10509_SHARP_){
-return cljs.core.reset_BANG_(minesweeper_reagent.core.grid_size,p1__10509_SHARP_.target.value);
-})], null)], null)], null)], null);
+return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$input,new cljs.core.PersistentArrayMap(null, 4, [cljs.core.cst$kw$style,new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$width,"6%",cljs.core.cst$kw$padding,"4px 0;",cljs.core.cst$kw$background_DASH_color,"lightgray"], null),cljs.core.cst$kw$type,"number",cljs.core.cst$kw$value,cljs.core.deref(minesweeper_reagent.core.grid_size),cljs.core.cst$kw$on_DASH_change,(function (p1__10509_SHARP_){
+cljs.core.reset_BANG_(minesweeper_reagent.core.grid_size,p1__10509_SHARP_.target.value);
+
+return cljs.core.reset_BANG_(minesweeper_reagent.core.app_state,cljs.core.into.cljs$core$IFn$_invoke$arity$2(cljs.core.PersistentArrayMap.EMPTY,cljs.core.map.cljs$core$IFn$_invoke$arity$3(cljs.core.vector,minesweeper_reagent.core.rand_positions(),minesweeper_reagent.core.set_mines())));
+})], null)], null);
 });
 });
 minesweeper_reagent.core.mines_input = (function minesweeper_reagent$core$mines_input(){
 return (function (){
-return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$div,new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$p,"Mine count: ",new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$input,new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$type,"number",cljs.core.cst$kw$value,cljs.core.deref(minesweeper_reagent.core.num_mines),cljs.core.cst$kw$on_DASH_change,(function (p1__10510_SHARP_){
-return cljs.core.reset_BANG_(minesweeper_reagent.core.num_mines,p1__10510_SHARP_.target.value);
-})], null)], null)], null)], null);
+return new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$input,new cljs.core.PersistentArrayMap(null, 4, [cljs.core.cst$kw$style,new cljs.core.PersistentArrayMap(null, 3, [cljs.core.cst$kw$width,"6%",cljs.core.cst$kw$padding,"4px 0;",cljs.core.cst$kw$background_DASH_color,"lightgray"], null),cljs.core.cst$kw$type,"number",cljs.core.cst$kw$value,cljs.core.deref(minesweeper_reagent.core.num_mines),cljs.core.cst$kw$on_DASH_change,(function (p1__10510_SHARP_){
+cljs.core.reset_BANG_(minesweeper_reagent.core.num_mines,p1__10510_SHARP_.target.value);
+
+return cljs.core.reset_BANG_(minesweeper_reagent.core.app_state,cljs.core.into.cljs$core$IFn$_invoke$arity$2(cljs.core.PersistentArrayMap.EMPTY,cljs.core.map.cljs$core$IFn$_invoke$arity$3(cljs.core.vector,minesweeper_reagent.core.rand_positions(),minesweeper_reagent.core.set_mines())));
+})], null)], null);
 });
 });
 minesweeper_reagent.core.minesweeper = (function minesweeper_reagent$core$minesweeper(){
-return new cljs.core.PersistentVector(null, 7, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$center,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$h1,"Minesweeper"], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [minesweeper_reagent.core.size_input], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [minesweeper_reagent.core.mines_input], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$p], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$div,new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$style,new cljs.core.PersistentArrayMap(null, 1, [cljs.core.cst$kw$font_DASH_size,"75px"], null),cljs.core.cst$kw$on_DASH_click,(function (){
+return new cljs.core.PersistentVector(null, 6, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$center,new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$h1,"Minesweeper"], null),new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$div,"Size: ",new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [minesweeper_reagent.core.size_input], null)," Mines: ",new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [minesweeper_reagent.core.mines_input], null)], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$p], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$div,new cljs.core.PersistentArrayMap(null, 2, [cljs.core.cst$kw$style,new cljs.core.PersistentArrayMap(null, 1, [cljs.core.cst$kw$font_DASH_size,"75px"], null),cljs.core.cst$kw$on_DASH_click,(function (){
 return cljs.core.reset_BANG_(minesweeper_reagent.core.app_state,cljs.core.into.cljs$core$IFn$_invoke$arity$2(cljs.core.PersistentArrayMap.EMPTY,cljs.core.map.cljs$core$IFn$_invoke$arity$3(cljs.core.vector,minesweeper_reagent.core.rand_positions(),minesweeper_reagent.core.set_mines())));
 })], null),minesweeper_reagent.core.icon()], null),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [minesweeper_reagent.core.render_board], null)], null);
 });

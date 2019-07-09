@@ -131,7 +131,6 @@
   [:text
    {:y 0.5
     :text-anchor "middle"
-;    :font-weight "900"
     :font-size "1.5"}
    "💥"])
 
@@ -148,7 +147,7 @@
    [:svg.board
     {:view-box (str "0 0 " @grid-size " " @grid-size)
      :shape-rendering "auto"
-     :style {:max-height "800px"}}]
+     :style {:max-height "500px"}}]
    (for [[[x y] attrs] @app-state]
      [:g {:transform (str "translate(" x  "," y ") "
                           "scale (0.5)"
@@ -163,25 +162,28 @@
 
 (defn size-input []
   (fn []
-    [:div
-     [:p "Grid size: "
-      [:input {:type "number"
+      [:input {:style {:width "6%"
+                       :padding "4px 0;"
+                       :background-color "lightgray"}
+               :type "number"
                :value @grid-size
-               :on-change #(reset! grid-size (-> % .-target .-value))}]]]))
+               :on-change #(do (reset! grid-size (-> % .-target .-value))
+                               (reset! app-state (into {} (map vector (rand-positions) (set-mines)))))}]))
 
 (defn mines-input []
   (fn []
-    [:div
-     [:p "Mine count: "
-      [:input {:type "number"
+      [:input {:style {:width "6%"
+                       :padding "4px 0;"
+                       :background-color "lightgray"}
+               :type "number"
                :value @num-mines
-               :on-change #(reset! num-mines (-> % .-target .-value))}]]]))
+               :on-change #(do (reset! num-mines (-> % .-target .-value))
+                               (reset! app-state (into {} (map vector (rand-positions) (set-mines)))))}]))
 
 (defn minesweeper []
   [:center
    [:h1 "Minesweeper"]
-   [size-input]
-   [mines-input]
+   [:div "Size: " [size-input] " Mines: " [mines-input]]
    [:p ]
    [:div
     {:style {:font-size "75px"}
