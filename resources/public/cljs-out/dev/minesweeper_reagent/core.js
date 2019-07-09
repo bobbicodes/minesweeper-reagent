@@ -422,7 +422,7 @@ minesweeper_reagent.core.mine_num = (function minesweeper_reagent$core$mine_num(
 var vec__10482 = p__10481;
 var x = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__10482,(0),null);
 var y = cljs.core.nth.cljs$core$IFn$_invoke$arity$3(vec__10482,(1),null);
-return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$text,new cljs.core.PersistentArrayMap(null, 6, [cljs.core.cst$kw$y,0.5,cljs.core.cst$kw$text_DASH_anchor,"middle",cljs.core.cst$kw$font_DASH_weight,"900",cljs.core.cst$kw$fill,(function (){var G__10485 = minesweeper_reagent.core.mine_detector(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null));
+return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.cst$kw$text,new cljs.core.PersistentArrayMap(null, 8, [cljs.core.cst$kw$y,0.5,cljs.core.cst$kw$text_DASH_anchor,"middle",cljs.core.cst$kw$font_DASH_weight,"900",cljs.core.cst$kw$fill,(function (){var G__10485 = minesweeper_reagent.core.mine_detector(new cljs.core.PersistentVector(null, 2, 5, cljs.core.PersistentVector.EMPTY_NODE, [x,y], null));
 switch (G__10485) {
 case (1):
 return "blue";
@@ -448,7 +448,15 @@ default:
 return "black";
 
 }
-})(),cljs.core.cst$kw$font_DASH_size,"1.25",cljs.core.cst$kw$on_DASH_contextMenu,((function (vec__10482,x,y){
+})(),cljs.core.cst$kw$font_DASH_size,"1.25",cljs.core.cst$kw$on_DASH_mouse_DASH_down,((function (vec__10482,x,y){
+return (function (){
+return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,true);
+});})(vec__10482,x,y))
+,cljs.core.cst$kw$on_DASH_mouse_DASH_up,((function (vec__10482,x,y){
+return (function (){
+return cljs.core.reset_BANG_(minesweeper_reagent.core.mouse_down_QMARK_,false);
+});})(vec__10482,x,y))
+,cljs.core.cst$kw$on_DASH_contextMenu,((function (vec__10482,x,y){
 return (function (p1__10480_SHARP_){
 p1__10480_SHARP_.preventDefault();
 

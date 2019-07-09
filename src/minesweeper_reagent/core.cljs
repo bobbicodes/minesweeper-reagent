@@ -118,6 +118,10 @@
             5 "brown"
             "black")
     :font-size "1.25"
+    :on-mouse-down
+    #(reset! mouse-down? true)
+    :on-mouse-up
+    #(reset! mouse-down? false)
     :on-contextMenu
     #(do (.preventDefault %)
          (run! step! (neighbors [x y])))}
