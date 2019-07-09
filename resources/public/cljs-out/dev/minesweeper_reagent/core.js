@@ -322,7 +322,7 @@ return "\uD83E\uDD13";
 break;
 default:
 if(cljs.core.truth_(cljs.core.deref(minesweeper_reagent.core.mouse_down_QMARK_))){
-return "\uD83D\uDE32";
+return "\uD83D\uDE2C";
 } else {
 return "\uD83E\uDD7A";
 }

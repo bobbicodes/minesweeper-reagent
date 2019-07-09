@@ -53,7 +53,7 @@
   (case (game-status)
     :dead "🤯"
     :win "🤓"
-    (if @mouse-down? "😲" "🥺")))
+    (if @mouse-down? "😬" "🥺")))
 
 (def mouse-over-cell (atom nil))
 
