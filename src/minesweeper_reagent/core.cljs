@@ -1,7 +1,10 @@
-(ns ^:figwheel-hooks ms.core
+(ns ^:figwheel-hooks minesweeper-reagent.core
   (:require
    [goog.dom :as gdom]
-   [reagent.core :as reagent :refer [atom]]))
+   [reagent.core :as reagent :refer [atom]]
+   [clojure.set :as set]))
+
+(defn multiply [a b] (* a b))
 
 (def app-state
   (atom {:width 15
@@ -29,37 +32,32 @@
   (reset! cleared #{})
   (reset! flagged #{}))
 
-(defn width-input []
-  [:label " Width: "
+(defn number-input [label value on-change]
+  [:label label
    [:input
     {:style {:width "6%"
              :background-color "lightgray"}
      :type "number"
-     :value (:width @app-state)
-     :on-change (fn [e] (swap! app-state assoc :width (-> e .-target .-value))
-                  (new-board!))}]])
+     :value value
+     :on-change on-change}]])
 
 (defn height-input []
-  [:label "Height: "
-   [:input
-    {:style {:width "6%"
-             :background-color "lightgray"}
-     :type "number"
-     :value (:height @app-state)
-     :on-change (fn [e] (swap! app-state assoc :height (-> e .-target .-value))
-                  (new-board!))}]])
+  (number-input "Height: " (:height @app-state)
+                (fn [e] (swap! app-state assoc :height
+                               (-> e .-target .-value))
+                  (new-board!))))
+
+(defn width-input []
+  (number-input " Width: " (:width @app-state)
+                  (fn [e] (swap! app-state assoc :width
+                                 (-> e .-target .-value))
+                    (new-board!))))
 
 (defn mines-input []
-  [:label " % mines"
-   [:input
-    {:style {:width "6%"
-             :background-color "lightgray"}
-     :type "number"
-     :value (:percent-mines @app-state)
-     :on-change (fn [e]
-                  (swap! app-state assoc
-                         :percent-mines (js/parseInt (-> e .-target .-value)))
-                  (new-board!))}]])
+  (number-input " % mines" (:percent-mines @app-state)
+                (fn [e] (swap! app-state assoc :percent-mines
+                               (js/parseInt (-> e .-target .-value)))
+                  (new-board!))))
 
 (defn set-mines [[x y]]
   (set (take (* (/ (:percent-mines @app-state) 100)
@@ -68,9 +66,9 @@
 
 (defn neighbors [[x y]]
   (filter #(contains? @cells %)
-  (for [dx [-1 0 1] dy [-1 0 1]
-        :when (or dx dy)]
-    [(+ x dx) (+ y dy)])))
+          (for [dx [-1 0 1] dy [-1 0 1]
+                :when (or dx dy)]
+            [(+ x dx) (+ y dy)])))
 
 (defn mine-count [[x y]]
   (if (contains? @mines [x y]) 1 0))
@@ -92,15 +90,9 @@
 
 (defn game-status []
   (cond
-    (seq (clojure.set/intersection
-          @cleared @mines))
-    :dead
-    (every? #(or (contains? @cleared %)
-                 (contains? @mines %))
-            @cells)
-    :win
-    (seq @cleared)
-    :in-progress
+    (seq (set/intersection @cleared @mines)) :dead
+    (= @cells (set/union @cleared @mines)) :win
+    (seq @cleared) :in-progress
     :else :new))
 
 (defn icon []
@@ -120,49 +112,50 @@
 (defn unflag! [[x y]]
   (swap! flagged disj [x y]))
 
-(defn cell [status [x y]]
+(defn covered-cell [[x y]]
   (let [focused? (atom false)]
-    (fn [status [x y]]
-      (if (= status :covered)
-        [:rect
-         {:width 1.85 :height 1.85
-          :x -0.9 :y -0.9
-          :stroke-width (if @focused? 0.1 0.08)
-          :stroke "black"
-          :fill (if @focused? "darkgrey" "silver")
-          :on-mouse-down
-          #(if-not (= (game-status) :dead)
-             (swap! app-state assoc :mouse-down? true))
-          :on-mouse-up
-          #(swap! app-state assoc :mouse-down? false)
-          :on-mouse-over
-          #(if-not (= (game-status) :dead)
-             (reset! focused? true))
-          :on-mouse-out
-          #(reset! focused? false)
-          :on-click
-          (fn [e] (when-not (or (contains? @flagged [x y])
-                                (= (game-status) :dead))
-                    (when (= (game-status) :new)
-                      (reset! mines (set-mines [x y])))
-                    (step! [x y])))
-          :on-contextMenu
-          #(do (.preventDefault %)
-               (swap! app-state assoc :mouse-down? false)
-               (if (contains? @flagged [x y])
-                 (unflag! [x y])
-                 (flag! [x y])))}]
-        [:rect
-         {:width 1.85 :height 1.85
-          :x -0.9 :y -0.9
-          :stroke-width 0.08
-          :stroke "black"
-          :fill "white"
-          :on-contextMenu
-          (fn [e]
-            (.preventDefault e)
-            (swap! app-state assoc :mouse-down? false)
-            (run! step! (neighbors [x y])))}]))))
+    (fn [[x y]]
+      [:rect
+       {:width 1.85 :height 1.85
+        :x -0.9 :y -0.9
+        :stroke-width (if @focused? 0.1 0.08)
+        :stroke "black"
+        :fill (if @focused? "darkgrey" "silver")
+        :on-mouse-down
+        #(if-not (= (game-status) :dead)
+           (swap! app-state assoc :mouse-down? true))
+        :on-mouse-up
+        #(swap! app-state assoc :mouse-down? false)
+        :on-mouse-over
+        #(if-not (= (game-status) :dead)
+           (reset! focused? true))
+        :on-mouse-out
+        #(reset! focused? false)
+        :on-click
+        (fn [e] (when-not (or (contains? @flagged [x y])
+                              (= (game-status) :dead))
+                  (when (= (game-status) :new)
+                    (reset! mines (set-mines [x y])))
+                  (step! [x y])))
+        :on-contextMenu
+        (fn [e] (.preventDefault e)
+          (swap! app-state assoc :mouse-down? false)
+          (if (contains? @flagged [x y])
+            (unflag! [x y])
+            (flag! [x y])))}])))
+
+(defn cleared-cell [[x y]]
+  [:rect
+   {:width 1.85 :height 1.85
+    :x -0.9 :y -0.9
+    :stroke-width 0.08
+    :stroke "black"
+    :fill "white"
+    :on-contextMenu
+    (fn [e]
+      (.preventDefault e)
+      (swap! app-state assoc :mouse-down? false)
+      (run! step! (neighbors [x y])))}])
 
 (defn flag [[x y]]
   [:text
@@ -213,19 +206,20 @@
                            "scale (0.5)"
                            "translate(1,1)")}
        (if (contains? @cleared [x y])
-         [cell :cleared [x y]])
+         [cleared-cell [x y]])
        (if (< 0 (mine-detector [x y]))
          [mine-num [x y]])
        (if (contains? @mines [x y])
          [bomb])
        (when-not (contains? @cleared [x y])
-         [cell :covered [x y]])
+         [covered-cell [x y]])
        (if (contains? @flagged [x y])
          [flag [x y]])]))])
 
 (defn minesweeper []
   [:center
-      [:div {:style {:font-size "14px"}} [height-input] [width-input] [mines-input]]
+      [:div {:style {:font-size "14px"}}
+       [height-input] [width-input] [mines-input]]
    [:p]
    [:div
     {:style {:font-size "75px"}
