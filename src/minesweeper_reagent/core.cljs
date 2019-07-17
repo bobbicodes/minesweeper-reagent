@@ -4,8 +4,6 @@
    [reagent.core :as reagent :refer [atom]]
    [clojure.set :as set]))
 
-(defn multiply [a b] (* a b))
-
 (def app-state
   (atom {:width 15
          :height 10
@@ -66,8 +64,7 @@
 
 (defn neighbors [[x y]]
   (filter #(contains? @cells %)
-          (for [dx [-1 0 1] dy [-1 0 1]
-                :when (or dx dy)]
+          (for [dx [-1 0 1] dy [-1 0 1]]
             [(+ x dx) (+ y dy)])))
 
 (defn mine-count [[x y]]
